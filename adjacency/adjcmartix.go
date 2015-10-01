@@ -3,6 +3,7 @@ import (
 	"log"
 	"encoding/json"
 	"io/ioutil"
+//	"fmt"
 )
 
 
@@ -56,5 +57,25 @@ func getAdjancencyGraphFromFile(filePath string) AdjacencyGraph {
 	}
 
 	return graph
+}
+
+//on qwerty, 'g' has degree 6, being adjacent to 'ftyhbv'. '\' has degree 1.
+//this calculates the average over all keys.
+//TODO double check that i ported this correctly scoring.coffee ln 5
+func (adjGrp AdjacencyGraph) CalculateAvgDegree() (float32) {
+	var avg float32
+	var count float32
+	for _, value := range adjGrp.Graph {
+
+		for _, char := range value {
+			if char != "" || char != " " {
+				avg += float32(len(char))
+				count++
+			}
+		}
+
+	}
+
+	return avg/count
 }
 
