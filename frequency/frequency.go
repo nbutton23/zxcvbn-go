@@ -5,29 +5,8 @@ import (
 	"encoding/json"
 )
 
-type TempList struct {
+type listWrapper struct {
 	List []string
-}
-type FrequencyLists struct {
-	MaleNames []string
-	FemaleNames []string
-	Surnames []string
-	Passwords []string
-	English []string
-}
-
-var FreqLists FrequencyLists
-func init() {
-	maleNames := GetStringListFromFile("/Users/nbutton/workspace/src/zxcvbn-go/frequency/MaleNames.json")
-	femaleNames := GetStringListFromFile("/Users/nbutton/workspace/src/zxcvbn-go/frequency/FemaleNames.json")
-	surnames := GetStringListFromFile("/Users/nbutton/workspace/src/zxcvbn-go/frequency/Surnames.json")
-	passwords := GetStringListFromFile("/Users/nbutton/workspace/src/zxcvbn-go/frequency/Passwords.json")
-	english := GetStringListFromFile("/Users/nbutton/workspace/src/zxcvbn-go/frequency/English.json")
-
-
-
-
-	FreqLists = FrequencyLists{MaleNames:maleNames, FemaleNames:femaleNames, Surnames:surnames, Passwords:passwords, English:english}
 }
 
 func GetStringListFromFile(filePath string) []string {
@@ -38,10 +17,10 @@ func GetStringListFromFile(filePath string) []string {
 	}
 
 
-	var templist TempList;
-	err = json.Unmarshal(data, &templist)
+	var tempList listWrapper;
+	err = json.Unmarshal(data, &tempList)
 	if err != nil {
 		log.Fatal(err)
 	}
-	return templist.List
+	return tempList.List
 }

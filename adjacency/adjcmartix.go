@@ -4,45 +4,48 @@ import (
 	"encoding/json"
 	"io/ioutil"
 //	"fmt"
+	"path/filepath"
 )
 
 
 type AdjacencyGraph struct {
 	Graph map[string][6]string
-}
-type AdjacencyGraphs struct {
-	Qwerty AdjacencyGraph
-	Dvorak AdjacencyGraph
-	Keypad AdjacencyGraph
-	MacKeypad AdjacencyGraph
+	averageDegree float32
+	Name string
 }
 
-var AdjacencyGph AdjacencyGraphs;
+
+var AdjacencyGph []AdjacencyGraph;
 func init(){
 	//todo get currentloc so that i don't have to know the whole path
 	log.SetFlags(log.Lshortfile)
-	qwerty := buildQwerty()
-	dvorak := buildDvorak()
-	keyPad := buildKeypad()
-	macKeypad := buildMacKeypad()
+	AdjacencyGph = append(AdjacencyGph, buildQwerty())
+	AdjacencyGph = append(AdjacencyGph, buildDvorak())
+	AdjacencyGph = append(AdjacencyGph, buildKeypad())
+	AdjacencyGph = append(AdjacencyGph, buildMacKeypad())
 
-	AdjacencyGph = AdjacencyGraphs{Qwerty:qwerty, Dvorak:dvorak, Keypad:keyPad, MacKeypad:macKeypad}
+
+
 }
 
 func buildQwerty() AdjacencyGraph {
-	return getAdjancencyGraphFromFile("/Users/nbutton/workspace/src/zxcvbn-go/adjacency/Qwerty.json")
+	filePath, _ := filepath.Abs("adjacency/Qwerty.json")
+	return getAdjancencyGraphFromFile(filePath, "qwerty")
 }
 func buildDvorak() AdjacencyGraph {
-	return getAdjancencyGraphFromFile("/Users/nbutton/workspace/src/zxcvbn-go/adjacency/Dvorak.json")
+	filePath, _ := filepath.Abs("adjacency/Dvorak.json")
+	return getAdjancencyGraphFromFile(filePath, "dvorak")
 }
 func buildKeypad() AdjacencyGraph {
-	return getAdjancencyGraphFromFile("/Users/nbutton/workspace/src/zxcvbn-go/adjacency/Keypad.json")
+	filePath, _ := filepath.Abs("adjacency/Keypad.json")
+	return getAdjancencyGraphFromFile(filePath, "keypad")
 }
 func buildMacKeypad() AdjacencyGraph {
-	return getAdjancencyGraphFromFile("/Users/nbutton/workspace/src/zxcvbn-go/adjacency/MacKeypad.json")
+	filePath, _ := filepath.Abs("adjacency/MacKeypad.json")
+	return getAdjancencyGraphFromFile(filePath, "mac_keypad")
 }
 
-func getAdjancencyGraphFromFile(filePath string) AdjacencyGraph {
+func getAdjancencyGraphFromFile(filePath string, name string) AdjacencyGraph {
 	data, err := ioutil.ReadFile(filePath)
 
 	if err != nil {
@@ -55,7 +58,7 @@ func getAdjancencyGraphFromFile(filePath string) AdjacencyGraph {
 	if err != nil {
 		log.Fatal(err)
 	}
-
+	graph.Name = name
 	return graph
 }
 
@@ -63,6 +66,9 @@ func getAdjancencyGraphFromFile(filePath string) AdjacencyGraph {
 //this calculates the average over all keys.
 //TODO double check that i ported this correctly scoring.coffee ln 5
 func (adjGrp AdjacencyGraph) CalculateAvgDegree() (float32) {
+	if adjGrp.averageDegree != float32(0) {
+		return adjGrp.averageDegree
+	}
 	var avg float32
 	var count float32
 	for _, value := range adjGrp.Graph {
@@ -76,6 +82,8 @@ func (adjGrp AdjacencyGraph) CalculateAvgDegree() (float32) {
 
 	}
 
-	return avg/count
+	adjGrp.averageDegree = avg/count
+
+	return adjGrp.averageDegree
 }
 
