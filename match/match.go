@@ -26,6 +26,7 @@ type Match struct {
 	Turns          int
 	ShiftedCount   int
 	Entropy        float64
+	RepeatedChar	string
 }
 
 type DateMatch struct {

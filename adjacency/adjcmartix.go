@@ -9,7 +9,7 @@ import (
 
 
 type AdjacencyGraph struct {
-	Graph map[string][6]string
+	Graph map[string][]string
 	averageDegree float64
 	Name string
 }

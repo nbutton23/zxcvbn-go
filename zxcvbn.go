@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	password :="qw@!abcdPLSB$6D"
+	password :="Testaaatyhg890l33t"
 	fmt.Println(PasswordStrength(password, nil))
 }
 

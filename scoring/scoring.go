@@ -15,9 +15,16 @@ const (
 	START_UPPER string = `^[A-Z][^A-Z]+$`
 	END_UPPER string = `^[^A-Z]+[A-Z]$'`
 	ALL_UPPER string = `^[A-Z]+$`
+
+//for a hash function like bcrypt/scrypt/PBKDF2, 10ms per guess is a safe lower bound.
+//(usually a guess would take longer -- this assumes fast hardware and a small work factor.)
+//adjust for your site accordingly if you use another hash function, possibly by
+//several orders of magnitude!
 	SINGLE_GUESS float64 = 0.010
-	NUM_ATTACKERS float64 = 100
+	NUM_ATTACKERS float64 = 100 //Cores used to make guesses
 	SECONDS_PER_GUESS float64 = SINGLE_GUESS / NUM_ATTACKERS
+
+
 )
 type MinEntropyMatch struct {
 	Password         string
@@ -126,18 +133,18 @@ func get(a []float64, i int) float64 {
 
 	return a[i]
 }
-func calcBruteforceCardinality(password string) int {
-	lower, upper, digits, symbols := 0, 0, 0, 0
+func calcBruteforceCardinality(password string) float64 {
+	lower, upper, digits, symbols := float64(0), float64(0), float64(0), float64(0)
 
 	for _, char := range password {
 		if unicode.IsLower(char) {
-			lower = 26
+			lower = float64(26)
 		} else if unicode.IsDigit(char) {
-			digits = 10
+			digits = float64(10)
 		} else if unicode.IsUpper(char) {
-			upper = 26
+			upper = float64(26)
 		} else {
-			symbols = 33
+			symbols = float64(33)
 		}
 	}
 
@@ -155,6 +162,8 @@ func calcEntropy(match match.Match) float64 {
 		entropy = dictionaryEntropy(match)
 	} else if match.Pattern == "spatial" {
 		entropy = spatialEntropy(match)
+	} else if match.Pattern == "repeat" {
+		entropy = repeatEntropy(match)
 	}
 
 	match.Entropy = entropy
@@ -264,6 +273,13 @@ func extraUpperCaseEntropy(match match.Match) float64 {
 	return float64(math.Log2(possibililities))
 }
 
+func repeatEntropy(match match.Match) float64 {
+	cardinality := calcBruteforceCardinality(match.Token)
+	entropy := math.Log2(cardinality * float64(len(match.Token)))
+
+	return entropy
+}
+
 func entropyToCrackTime(entropy float64) float64 {
 	crackTime := (0.5 * math.Pow(float64(2), entropy)) * SECONDS_PER_GUESS
 
@@ -275,7 +291,7 @@ func roundToXDigits(number float64, digits int) float64 {
 }
 
 func displayTime(seconds float64) string {
-	formater := "%d %s"
+	formater := "%.1f %s"
 	minute := float64(60)
 	hour := minute * float64(60)
 	day := hour * float64(24)
