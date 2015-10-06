@@ -56,7 +56,7 @@ Bug reports and pull requests welcome!
 Project Status
 ------------------------------------------------------------------------
 
-This is a work in progress. It is currently at a point that I feel it is usable, but it is not feature parity with the original libraries.
+This is a work in progress. It is currently at a point that I feel it is usable, but it is not feature parity with the original libraries. I would welcome some review of the code. I am new to goLang and expect that I have made some mistakes; if not in logic in performance.
 
 ------------------------------------------------------------------------
 Acknowledgment
