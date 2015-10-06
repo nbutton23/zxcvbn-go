@@ -1,7 +1,6 @@
 package zxcvbn
 
 import (
-	"fmt"
 	"zxcvbn-go/matching"
 	"zxcvbn-go/scoring"
 	"time"
