@@ -8,6 +8,7 @@ import (
 	"zxcvbn-go/adjacency"
 	"zxcvbn-go/match"
 	"sort"
+//	"github.com/deckarep/golang-set"
 )
 
 var (
@@ -18,6 +19,7 @@ var (
 	KEYBOARD_AVG_DEGREE float64
 	KEYPAD_STARTING_POSITIONS int
 	KEYPAD_AVG_DEGREE float64
+	L33T_TABLE adjacency.AdjacencyGraph
 )
 
 const (
@@ -82,8 +84,13 @@ func loadFrequencyList() {
 	ADJACENCY_GRAPHS = append(ADJACENCY_GRAPHS, keypadGraph)
 	ADJACENCY_GRAPHS = append(ADJACENCY_GRAPHS, adjacency.GetAdjancencyGraphFromFile(macKeypadfilePath, "macKepad"))
 
+	l33tFilePath, _ := filepath.Abs("adjacency/L33t.json")
+	L33T_TABLE = adjacency.GetAdjancencyGraphFromFile(l33tFilePath, "l33t")
+
 	MATCHERS = append(MATCHERS, DICTIONARY_MATCHERS...)
-	MATCHERS = append(MATCHERS, SpatialMatch)
+	MATCHERS = append(MATCHERS, spatialMatch)
+	MATCHERS = append(MATCHERS, repeatMatch)
+
 }
 
 
@@ -246,7 +253,7 @@ func buildDateMatchCandidateTwo(day, month byte, year string, i, j int) match.Da
 }
 
 
-func SpatialMatch(password string) (matches []match.Match) {
+func spatialMatch(password string) (matches []match.Match) {
 	for _, graph := range ADJACENCY_GRAPHS {
 		matches = append(matches, spatialMatchHelper(password, graph)...)
 	}
@@ -299,7 +306,6 @@ func spatialMatchHelper(password string, graph adjacency.AdjacencyGraph) (matche
 				j += 1
 			} else {
 				//					otherwise push the pattern discovered so far, if any...
-
 				//					don't consider length 1 or 2 chains.
 				if j - i > 2 {
 					matches = append(matches, match.Match{Pattern:"spatial", I:i, J:j - 1, Token:password[i:j], DictionaryName:graph.Name, Turns:turns, ShiftedCount:shiftedCount })
@@ -310,6 +316,83 @@ func spatialMatchHelper(password string, graph adjacency.AdjacencyGraph) (matche
 			}
 		}
 
+	}
+	return matches
+}
+
+func relevantL33tSubtable(password string) adjacency.AdjacencyGraph {
+	var releventSubs adjacency.AdjacencyGraph
+	for _, char := range password {
+		if len(L33T_TABLE.Graph[string(char)]) > 0 {
+			releventSubs.Graph[string(char)] = L33T_TABLE.Graph[string(char)]
+		}
+	}
+
+	return releventSubs
+}
+
+//TODO yeah this is a little harder than i expect. . .
+//func enumerateL33tSubs(table adjacency.AdjacencyGraph) []string {
+//	var subs [][]string
+//
+//	dedup := func(subs []string) []string {
+//		 deduped := mapset.NewSetFromSlice(subs)
+//		return deduped.ToSlice()
+//	}
+//
+//	for i,v := range table.Graph {
+//		var nextSubs []string
+//		for _, subChar := range v {
+//
+//		}
+//
+//	}
+//}
+
+func repeatMatch(password string) []match.Match {
+	var matches []match.Match
+
+	//Loop through password. if current == prev currentStreak++ else if currentStreak > 2 {buildMatch; currentStreak = 1} prev = current
+	var current, prev string
+	currentStreak := 1
+	var i int
+	var char rune
+	for i, char = range password {
+		current = string(char)
+		if i == 0 {
+			prev = current
+			continue
+		}
+
+		if current == prev {
+			currentStreak++
+
+		} else if currentStreak > 2 {
+			iPos := i-currentStreak
+			jPos := i-1
+			matches = append(matches, match.Match{
+				Pattern:"repeat",
+				I:iPos,
+				J:jPos,
+				Token:password[iPos:jPos+1],
+				RepeatedChar:prev})
+			currentStreak = 1
+		} else {
+			currentStreak = 1
+		}
+
+		prev = current
+	}
+
+	if currentStreak > 2 {
+		iPos := i - currentStreak+1
+		jPos := i
+		matches = append(matches, match.Match{
+			Pattern:"repeat",
+			I:iPos,
+			J:jPos,
+			Token:password[iPos:jPos + 1],
+			RepeatedChar:prev})
 	}
 	return matches
 }
