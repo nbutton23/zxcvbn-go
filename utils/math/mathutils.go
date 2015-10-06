@@ -1,4 +1,5 @@
-package math
+package zxcvbn_math
+import "math"
 
 
 
@@ -7,22 +8,34 @@ I am surprised that I have to define these. . . Maybe i just didn't look hard en
  */
 
 //http://blog.plover.com/math/choose.html
-func NChoseK(n, k uint) uint64 {
-	uN := uint64(n)
-	uK := uint64(k)
-	if uK > uN {
+func NChoseK(n, k float64) float64 {
+	if k > n {
 		return 0
-	} else if uK == 0 {
+	} else if k == 0 {
 		return 1
 	}
 
-	var  r uint64 = 1
+	var r float64 = 1
 
-	for d := uint64(1) ; d <= uK; d++ {
-		r *= uN
+	for d := float64(1); d <= k; d++ {
+		r *= n
 		r /= d
-		uN--
+		n--
 	}
 
 	return r
+}
+
+func Round(val float64, roundOn float64, places int) (newVal float64) {
+	var round float64
+	pow := math.Pow(10, float64(places))
+	digit := pow * val
+	_, div := math.Modf(digit)
+	if div >= roundOn {
+		round = math.Ceil(digit)
+	} else {
+		round = math.Floor(digit)
+	}
+	newVal = round / pow
+	return
 }
