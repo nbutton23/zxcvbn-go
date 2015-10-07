@@ -3,10 +3,9 @@ import (
 	"strings"
 	"regexp"
 	"strconv"
-	"zxcvbn-go/frequency"
-	"path/filepath"
-	"zxcvbn-go/adjacency"
-	"zxcvbn-go/match"
+	"github.com/nbutton23/zxcvbn-go/frequency"
+	"github.com/nbutton23/zxcvbn-go/adjacency"
+	"github.com/nbutton23/zxcvbn-go/match"
 	"sort"
 //	"github.com/deckarep/golang-set"
 )
@@ -53,39 +52,23 @@ func Omnimatch(password string, userInputs []string) (matches []match.Match) {
 }
 
 func loadFrequencyList() {
-	maleFilePath, _ := filepath.Abs("frequency/MaleNames.json")
-	femaleFilePath, _ := filepath.Abs("frequency/FemaleNames.json")
-	surnameFilePath, _ := filepath.Abs("frequency/Surnames.json")
-	englishFilePath, _ := filepath.Abs("frequency/English.json")
-	passwordsFilePath, _ := filepath.Abs("frequency/Passwords.json")
 
-	DICTIONARY_MATCHERS = append(DICTIONARY_MATCHERS, buildDictMatcher("MaleNames", buildRankedDict(frequency.GetStringListFromFile(maleFilePath))))
-	DICTIONARY_MATCHERS = append(DICTIONARY_MATCHERS, buildDictMatcher("FemaleNames", buildRankedDict(frequency.GetStringListFromFile(femaleFilePath))))
-	DICTIONARY_MATCHERS = append(DICTIONARY_MATCHERS, buildDictMatcher("Surnames", buildRankedDict(frequency.GetStringListFromFile(surnameFilePath))))
-	DICTIONARY_MATCHERS = append(DICTIONARY_MATCHERS, buildDictMatcher("English", buildRankedDict(frequency.GetStringListFromFile(englishFilePath))))
-	DICTIONARY_MATCHERS = append(DICTIONARY_MATCHERS, buildDictMatcher("Passwords", buildRankedDict(frequency.GetStringListFromFile(passwordsFilePath))))
+	for n, list := range frequency.FrequencyLists {
+		DICTIONARY_MATCHERS = append(DICTIONARY_MATCHERS,buildDictMatcher(n, buildRankedDict(list.List)))
+	}
 
-	qwertyfilePath, _ := filepath.Abs("adjacency/Qwerty.json")
-	dvorakfilePath, _ := filepath.Abs("adjacency/Dvorak.json")
-	keypadfilePath, _ := filepath.Abs("adjacency/Keypad.json")
-	macKeypadfilePath, _ := filepath.Abs("adjacency/MacKeypad.json")
+	KEYBOARD_AVG_DEGREE = adjacency.AdjacencyGph["querty"].CalculateAvgDegree()
+	KEYBOARD_STARTING_POSITIONS = len(adjacency.AdjacencyGph["querty"].Graph)
+	KEYPAD_AVG_DEGREE = adjacency.AdjacencyGph["keypad"].CalculateAvgDegree()
+	KEYPAD_STARTING_POSITIONS = len(adjacency.AdjacencyGph["keypad"].Graph)
 
-	qwertGraph := adjacency.GetAdjancencyGraphFromFile(qwertyfilePath, "qwert")
-	keypadGraph := adjacency.GetAdjancencyGraphFromFile(keypadfilePath, "keypad")
-
-
-	KEYBOARD_AVG_DEGREE = qwertGraph.CalculateAvgDegree()
-	KEYBOARD_STARTING_POSITIONS = len(qwertGraph.Graph)
-	KEYPAD_AVG_DEGREE = keypadGraph.CalculateAvgDegree()
-	KEYPAD_STARTING_POSITIONS = len(keypadGraph.Graph)
-
-	ADJACENCY_GRAPHS = append(ADJACENCY_GRAPHS, qwertGraph)
-	ADJACENCY_GRAPHS = append(ADJACENCY_GRAPHS, adjacency.GetAdjancencyGraphFromFile(dvorakfilePath, "dvorak"))
-	ADJACENCY_GRAPHS = append(ADJACENCY_GRAPHS, keypadGraph)
-	ADJACENCY_GRAPHS = append(ADJACENCY_GRAPHS, adjacency.GetAdjancencyGraphFromFile(macKeypadfilePath, "macKepad"))
-
-	l33tFilePath, _ := filepath.Abs("adjacency/L33t.json")
-	L33T_TABLE = adjacency.GetAdjancencyGraphFromFile(l33tFilePath, "l33t")
+	ADJACENCY_GRAPHS = append(ADJACENCY_GRAPHS, adjacency.AdjacencyGph["querty"])
+	ADJACENCY_GRAPHS = append(ADJACENCY_GRAPHS, adjacency.AdjacencyGph["dvorak"])
+	ADJACENCY_GRAPHS = append(ADJACENCY_GRAPHS, adjacency.AdjacencyGph["keypad"])
+	ADJACENCY_GRAPHS = append(ADJACENCY_GRAPHS, adjacency.AdjacencyGph["macKeypad"])
+//
+//	l33tFilePath, _ := filepath.Abs("adjacency/L33t.json")
+//	L33T_TABLE = adjacency.GetAdjancencyGraphFromFile(l33tFilePath, "l33t")
 
 	MATCHERS = append(MATCHERS, DICTIONARY_MATCHERS...)
 	MATCHERS = append(MATCHERS, spatialMatch)

@@ -1,13 +1,13 @@
 package scoring
 import (
-	"zxcvbn-go/match"
+	"github.com/nbutton23/zxcvbn-go/match"
 	"unicode"
 	"fmt"
 	"math"
 	"sort"
 	"regexp"
-	"zxcvbn-go/utils/math"
-	"zxcvbn-go/matching"
+	"github.com/nbutton23/zxcvbn-go/utils/math"
+	"github.com/nbutton23/zxcvbn-go/matching"
 )
 
 
