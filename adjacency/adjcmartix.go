@@ -2,9 +2,8 @@ package adjacency
 import (
 	"log"
 	"encoding/json"
-	"io/ioutil"
 //	"fmt"
-	"path/filepath"
+	"github.com/nbutton23/zxcvbn-go/data"
 )
 
 
@@ -15,35 +14,49 @@ type AdjacencyGraph struct {
 }
 
 
-
+var AdjacencyGph = make(map[string]AdjacencyGraph);
+func init() {
+	//todo get currentloc so that i don't have to know the whole path
+	log.SetFlags(log.Lshortfile)
+	AdjacencyGph["qwerty"] = buildQwerty()
+	AdjacencyGph["dvorak"] = buildDvorak()
+	AdjacencyGph["keypad"] = buildKeypad()
+	AdjacencyGph["macKeypad"] = buildMacKeypad()
+}
 
 func buildQwerty() AdjacencyGraph {
-	filePath, _ := filepath.Abs("Qwerty.json")
-	return GetAdjancencyGraphFromFile(filePath, "qwerty")
+	data, err := zxcvbn_data.Asset("data/Qwerty.json")
+	if err != nil {
+		panic("Can't find asset")
+	}
+	return GetAdjancencyGraphFromFile(data, "qwerty")
 }
 func buildDvorak() AdjacencyGraph {
-	filePath, _ := filepath.Abs("Dvorak.json")
-	return GetAdjancencyGraphFromFile(filePath, "dvorak")
+	data, err := zxcvbn_data.Asset("data/Dvorak.json")
+	if err != nil {
+		panic("Can't find asset")
+	}
+	return GetAdjancencyGraphFromFile(data, "dvorak")
 }
 func buildKeypad() AdjacencyGraph {
-	filePath, _ := filepath.Abs("Keypad.json")
-	return GetAdjancencyGraphFromFile(filePath, "keypad")
+	data, err := zxcvbn_data.Asset("data/Keypad.json")
+	if err != nil {
+		panic("Can't find asset")
+	}
+	return GetAdjancencyGraphFromFile(data, "keypad")
 }
 func buildMacKeypad() AdjacencyGraph {
-	filePath, _ := filepath.Abs("MacKeypad.json")
-	return GetAdjancencyGraphFromFile(filePath, "mac_keypad")
+	data, err := zxcvbn_data.Asset("data/MacKeypad.json")
+	if err != nil {
+		panic("Can't find asset")
+	}
+	return GetAdjancencyGraphFromFile(data, "mac_keypad")
 }
 
-func GetAdjancencyGraphFromFile(filePath string, name string) AdjacencyGraph {
-	data, err := ioutil.ReadFile(filePath)
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
+func GetAdjancencyGraphFromFile(data []byte, name string) AdjacencyGraph {
 
 	var graph AdjacencyGraph;
-	err = json.Unmarshal(data, &graph)
+	err := json.Unmarshal(data, &graph)
 	if err != nil {
 		log.Fatal(err)
 	}
