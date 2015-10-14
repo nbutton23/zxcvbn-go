@@ -23,6 +23,8 @@ type Match struct {
 	MatchedWord    string
 	Rank           float64
 	DictionaryName string
+	DictionaryLength int
+	Ascending bool
 	Turns          int
 	ShiftedCount   int
 	Entropy        float64

@@ -19,6 +19,8 @@ var (
 	KEYPAD_STARTING_POSITIONS int
 	KEYPAD_AVG_DEGREE float64
 	L33T_TABLE adjacency.AdjacencyGraph
+
+	SEQUENCES map[string]string
 )
 
 const (
@@ -29,7 +31,7 @@ const (
 
 
 func init() {
-
+loadFrequencyList()
 }
 
 func Omnimatch(password string, userInputs []string) (matches []match.Match) {
@@ -54,7 +56,7 @@ func Omnimatch(password string, userInputs []string) (matches []match.Match) {
 func loadFrequencyList() {
 
 	for n, list := range frequency.FrequencyLists {
-		DICTIONARY_MATCHERS = append(DICTIONARY_MATCHERS,buildDictMatcher(n, buildRankedDict(list.List)))
+		DICTIONARY_MATCHERS = append(DICTIONARY_MATCHERS, buildDictMatcher(n, buildRankedDict(list.List)))
 	}
 
 	KEYBOARD_AVG_DEGREE = adjacency.AdjacencyGph["querty"].CalculateAvgDegree()
@@ -66,13 +68,20 @@ func loadFrequencyList() {
 	ADJACENCY_GRAPHS = append(ADJACENCY_GRAPHS, adjacency.AdjacencyGph["dvorak"])
 	ADJACENCY_GRAPHS = append(ADJACENCY_GRAPHS, adjacency.AdjacencyGph["keypad"])
 	ADJACENCY_GRAPHS = append(ADJACENCY_GRAPHS, adjacency.AdjacencyGph["macKeypad"])
-//
-//	l33tFilePath, _ := filepath.Abs("adjacency/L33t.json")
-//	L33T_TABLE = adjacency.GetAdjancencyGraphFromFile(l33tFilePath, "l33t")
+	//
+	//	l33tFilePath, _ := filepath.Abs("adjacency/L33t.json")
+	//	L33T_TABLE = adjacency.GetAdjancencyGraphFromFile(l33tFilePath, "l33t")
+
+	SEQUENCES = make(map[string]string)
+	SEQUENCES["lower"] = "abcdefghijklmnopqrstuvwxyz"
+	SEQUENCES["upper"] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	SEQUENCES["digits"] = "0123456789"
 
 	MATCHERS = append(MATCHERS, DICTIONARY_MATCHERS...)
 	MATCHERS = append(MATCHERS, spatialMatch)
 	MATCHERS = append(MATCHERS, repeatMatch)
+	MATCHERS = append(MATCHERS, SequenceMatch)
+
 
 }
 
@@ -351,13 +360,13 @@ func repeatMatch(password string) []match.Match {
 			currentStreak++
 
 		} else if currentStreak > 2 {
-			iPos := i-currentStreak
-			jPos := i-1
+			iPos := i - currentStreak
+			jPos := i - 1
 			matches = append(matches, match.Match{
 				Pattern:"repeat",
 				I:iPos,
 				J:jPos,
-				Token:password[iPos:jPos+1],
+				Token:password[iPos:jPos + 1],
 				RepeatedChar:prev})
 			currentStreak = 1
 		} else {
@@ -368,7 +377,7 @@ func repeatMatch(password string) []match.Match {
 	}
 
 	if currentStreak > 2 {
-		iPos := i - currentStreak+1
+		iPos := i - currentStreak + 1
 		jPos := i
 		matches = append(matches, match.Match{
 			Pattern:"repeat",
@@ -376,6 +385,64 @@ func repeatMatch(password string) []match.Match {
 			J:jPos,
 			Token:password[iPos:jPos + 1],
 			RepeatedChar:prev})
+	}
+	return matches
+}
+
+func SequenceMatch(password string) []match.Match {
+	var matches []match.Match
+	for i := 0; i < len(password); {
+		j := i + 1
+		var seq string
+		var seqName string
+		seqDirection := 0
+		for seqCandidateName, seqCandidate := range SEQUENCES {
+			iN := strings.Index(seqCandidate, string(password[i]))
+			var jN int
+			if j < len(password) {
+				jN = strings.Index(seqCandidate, string(password[j]))
+			} else {
+				jN = -1
+			}
+
+			if iN > -1 && jN > -1 {
+				direction := jN - iN
+				if direction == 1 || direction == -1 {
+					seq = seqCandidate
+					seqName = seqCandidateName
+					seqDirection = direction
+					break
+				}
+			}
+
+		}
+
+		if seq != "" {
+			for ;; {
+				var prevN, curN int
+				if j < len(password) {
+					prevChar, curChar := password[j - 1], password[j]
+					prevN, curN = strings.Index(seq, string(prevChar)), strings.Index(seq, string(curChar))
+				}
+
+				if j == len(password) || curN - prevN != seqDirection {
+					if j - i > 2 {
+						matches = append(matches, match.Match{Pattern:"sequence",
+							I:i,
+							J:j-1,
+							Token:password[i:j],
+							DictionaryName:seqName,
+							DictionaryLength: len(seq),
+							Ascending:(seqDirection == 1)})
+					}
+					break
+				} else {
+					j += 1
+				}
+
+			}
+		}
+		i = j
 	}
 	return matches
 }

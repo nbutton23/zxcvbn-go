@@ -16,36 +16,35 @@ type AdjacencyGraph struct {
 
 var AdjacencyGph = make(map[string]AdjacencyGraph);
 func init() {
-	//todo get currentloc so that i don't have to know the whole path
 	log.SetFlags(log.Lshortfile)
-	AdjacencyGph["qwerty"] = buildQwerty()
-	AdjacencyGph["dvorak"] = buildDvorak()
-	AdjacencyGph["keypad"] = buildKeypad()
-	AdjacencyGph["macKeypad"] = buildMacKeypad()
+	AdjacencyGph["qwerty"] = BuildQwerty()
+	AdjacencyGph["dvorak"] = BuildDvorak()
+	AdjacencyGph["keypad"] = BuildKeypad()
+	AdjacencyGph["macKeypad"] = BuildMacKeypad()
 }
 
-func buildQwerty() AdjacencyGraph {
+func BuildQwerty() AdjacencyGraph {
 	data, err := zxcvbn_data.Asset("data/Qwerty.json")
 	if err != nil {
 		panic("Can't find asset")
 	}
 	return GetAdjancencyGraphFromFile(data, "qwerty")
 }
-func buildDvorak() AdjacencyGraph {
+func BuildDvorak() AdjacencyGraph {
 	data, err := zxcvbn_data.Asset("data/Dvorak.json")
 	if err != nil {
 		panic("Can't find asset")
 	}
 	return GetAdjancencyGraphFromFile(data, "dvorak")
 }
-func buildKeypad() AdjacencyGraph {
+func BuildKeypad() AdjacencyGraph {
 	data, err := zxcvbn_data.Asset("data/Keypad.json")
 	if err != nil {
 		panic("Can't find asset")
 	}
 	return GetAdjancencyGraphFromFile(data, "keypad")
 }
-func buildMacKeypad() AdjacencyGraph {
+func BuildMacKeypad() AdjacencyGraph {
 	data, err := zxcvbn_data.Asset("data/MacKeypad.json")
 	if err != nil {
 		panic("Can't find asset")
