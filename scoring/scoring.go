@@ -8,6 +8,7 @@ import (
 	"regexp"
 	"github.com/nbutton23/zxcvbn-go/utils/math"
 	"github.com/nbutton23/zxcvbn-go/matching"
+	"github.com/nbutton23/zxcvbn-go/adjacency"
 )
 
 
@@ -29,7 +30,7 @@ const (
 type MinEntropyMatch struct {
 	Password         string
 	Entropy          float64
-	MatchSequence    []match.Match //TODO ?
+	MatchSequence    []match.Match
 	CrackTime        float64
 	CrackTimeDisplay string
 	Score            int
@@ -37,7 +38,7 @@ type MinEntropyMatch struct {
 }
 
 /*
-Returns minimum entropy TODO
+Returns minimum entropy
 
     Takes a list of overlapping matches, returns the non-overlapping sublist with
     minimum entropy. O(nm) dp alg for length-n password with m candidate matches.
@@ -164,6 +165,8 @@ func calcEntropy(match match.Match) float64 {
 		entropy = spatialEntropy(match)
 	} else if match.Pattern == "repeat" {
 		entropy = repeatEntropy(match)
+	} else if match.Pattern == "sequence" {
+		entropy = sequenceEntropy(match)
 	}
 
 	match.Entropy = entropy
@@ -181,8 +184,8 @@ func dictionaryEntropy(match match.Match) float64 {
 func spatialEntropy(match match.Match) float64 {
 	var s, d float64
 	if match.DictionaryName == "qwerty" || match.DictionaryName == "dvorak" {
-		s = float64(matching.KEYBOARD_STARTING_POSITIONS)
-		d = matching.KEYBOARD_AVG_DEGREE
+		s = float64(len(adjacency.BuildQwerty().Graph))
+		d = adjacency.BuildKeypad().CalculateAvgDegree()
 	} else {
 		s = float64(matching.KEYPAD_STARTING_POSITIONS)
 		d = matching.KEYPAD_AVG_DEGREE
@@ -190,12 +193,12 @@ func spatialEntropy(match match.Match) float64 {
 
 	possibilities := float64(0)
 
-	lenght := float64(len(match.Token))
+	length := float64(len(match.Token))
 	t := match.Turns
 
 	//TODO: Should this be <= or just < ?
-	//Estimate the number of possible patterns w/ lenght L or less with t turns or less
-	for i := float64(2); i <= lenght + 1; i++ {
+	//Estimate the number of possible patterns w/ length L or less with t turns or less
+	for i := float64(2); i <= length + 1; i++ {
 		possibleTurns := math.Min(float64(t), i - 1)
 		for j := float64(1); j <= possibleTurns + 1; j++ {
 			x := zxcvbn_math.NChoseK(i - 1, j - 1) * s * math.Pow(d, j)
@@ -204,13 +207,12 @@ func spatialEntropy(match match.Match) float64 {
 	}
 
 	entropy := math.Log2(possibilities)
-
 	//add extra entropu for shifted keys. ( % instead of 5 A instead of a)
 	//Math is similar to extra entropy for uppercase letters in dictionary matches.
 
 	if S := float64(match.ShiftedCount); S > float64(0) {
 		possibilities = float64(0)
-		U := lenght - S
+		U := length - S
 
 		for i := float64(0); i < math.Min(S, U) + 1; i++ {
 			possibilities += zxcvbn_math.NChoseK(S + U, i)
@@ -220,6 +222,23 @@ func spatialEntropy(match match.Match) float64 {
 	}
 
 	return entropy
+}
+func sequenceEntropy(match match.Match) float64 {
+	firstChar := match.Token[0]
+	baseEntropy := float64(0)
+	if string(firstChar) == "a" || string(firstChar) == "1" {
+		baseEntropy = float64(0)
+	} else {
+		baseEntropy = math.Log2(float64(match.DictionaryLength))
+		if unicode.IsUpper(rune(firstChar)) {
+			baseEntropy ++
+		}
+	}
+
+	if !match.Ascending {
+		baseEntropy++
+	}
+	return baseEntropy + math.Log2(float64(len(match.Token)))
 }
 func extraUpperCaseEntropy(match match.Match) float64 {
 	word := match.Token
