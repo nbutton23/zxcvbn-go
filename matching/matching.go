@@ -36,6 +36,7 @@ loadFrequencyList()
 
 func Omnimatch(password string, userInputs []string) (matches []match.Match) {
 
+	//Can I run into the issue where nil is not equal to nil?
 	if DICTIONARY_MATCHERS == nil || ADJACENCY_GRAPHS == nil {
 		loadFrequencyList()
 	}
