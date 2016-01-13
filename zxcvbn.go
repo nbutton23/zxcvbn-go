@@ -3,8 +3,8 @@ package zxcvbn
 import (
 	"github.com/nbutton23/zxcvbn-go/matching"
 	"github.com/nbutton23/zxcvbn-go/scoring"
-	"time"
 	"github.com/nbutton23/zxcvbn-go/utils/math"
+	"time"
 )
 
 //func main() {

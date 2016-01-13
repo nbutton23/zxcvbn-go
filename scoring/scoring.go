@@ -1,32 +1,31 @@
 package scoring
-import (
-	"github.com/nbutton23/zxcvbn-go/match"
-	"unicode"
-	"fmt"
-	"math"
-	"sort"
-	"regexp"
-	"github.com/nbutton23/zxcvbn-go/utils/math"
-	"github.com/nbutton23/zxcvbn-go/matching"
-	"github.com/nbutton23/zxcvbn-go/adjacency"
-)
 
+import (
+	"fmt"
+	"github.com/nbutton23/zxcvbn-go/adjacency"
+	"github.com/nbutton23/zxcvbn-go/match"
+	"github.com/nbutton23/zxcvbn-go/matching"
+	"github.com/nbutton23/zxcvbn-go/utils/math"
+	"math"
+	"regexp"
+	"sort"
+	"unicode"
+)
 
 const (
 	START_UPPER string = `^[A-Z][^A-Z]+$`
-	END_UPPER string = `^[^A-Z]+[A-Z]$'`
-	ALL_UPPER string = `^[A-Z]+$`
+	END_UPPER   string = `^[^A-Z]+[A-Z]$'`
+	ALL_UPPER   string = `^[A-Z]+$`
 
-//for a hash function like bcrypt/scrypt/PBKDF2, 10ms per guess is a safe lower bound.
-//(usually a guess would take longer -- this assumes fast hardware and a small work factor.)
-//adjust for your site accordingly if you use another hash function, possibly by
-//several orders of magnitude!
-	SINGLE_GUESS float64 = 0.010
-	NUM_ATTACKERS float64 = 100 //Cores used to make guesses
+	//for a hash function like bcrypt/scrypt/PBKDF2, 10ms per guess is a safe lower bound.
+	//(usually a guess would take longer -- this assumes fast hardware and a small work factor.)
+	//adjust for your site accordingly if you use another hash function, possibly by
+	//several orders of magnitude!
+	SINGLE_GUESS      float64 = 0.010
+	NUM_ATTACKERS     float64 = 100 //Cores used to make guesses
 	SECONDS_PER_GUESS float64 = SINGLE_GUESS / NUM_ATTACKERS
-
-
 )
+
 type MinEntropyMatch struct {
 	Password         string
 	Entropy          float64
@@ -42,14 +41,14 @@ Returns minimum entropy
 
     Takes a list of overlapping matches, returns the non-overlapping sublist with
     minimum entropy. O(nm) dp alg for length-n password with m candidate matches.
- */
+*/
 func MinimumEntropyMatchSequence(password string, matches []match.Match) MinEntropyMatch {
 	bruteforceCardinality := float64(calcBruteforceCardinality(password))
 	upToK := make([]float64, len(password))
 	backPointers := make([]match.Match, len(password))
 
 	for k := 0; k < len(password); k++ {
-		upToK[k] = get(upToK, k - 1) + math.Log2(bruteforceCardinality)
+		upToK[k] = get(upToK, k-1) + math.Log2(bruteforceCardinality)
 
 		for _, match := range matches {
 			if match.J != k {
@@ -58,7 +57,7 @@ func MinimumEntropyMatchSequence(password string, matches []match.Match) MinEntr
 
 			i, j := match.I, match.J
 			//			see if best entropy up to i-1 + entropy of match is less that current min at j
-			upTo := get(upToK, i - 1)
+			upTo := get(upToK, i-1)
 			calculatedEntropy := calcEntropy(match)
 			match.Entropy = calculatedEntropy
 			candidateEntropy := upTo + calculatedEntropy
@@ -81,7 +80,7 @@ func MinimumEntropyMatchSequence(password string, matches []match.Match) MinEntr
 			matchSequence = append(matchSequence, match)
 			k = match.I - 1
 
-		}  else {
+		} else {
 			k--
 		}
 
@@ -89,11 +88,11 @@ func MinimumEntropyMatchSequence(password string, matches []match.Match) MinEntr
 	sort.Sort(match.Matches(matchSequence))
 
 	makeBruteForecMatch := func(i, j int) match.Match {
-		return match.Match{Pattern:"bruteforce",
-			I:i,
-			J:j,
-			Token:password[i:j + 1],
-			Entropy:math.Log2(math.Pow(bruteforceCardinality, float64(j - i)))}
+		return match.Match{Pattern: "bruteforce",
+			I:       i,
+			J:       j,
+			Token:   password[i : j+1],
+			Entropy: math.Log2(math.Pow(bruteforceCardinality, float64(j-i)))}
 
 	}
 
@@ -101,30 +100,30 @@ func MinimumEntropyMatchSequence(password string, matches []match.Match) MinEntr
 	var matchSequenceCopy []match.Match
 	for _, match := range matchSequence {
 		i, j := match.I, match.J
-		if i - k > 0 {
-			matchSequenceCopy = append(matchSequenceCopy, makeBruteForecMatch(k, i - 1))
+		if i-k > 0 {
+			matchSequenceCopy = append(matchSequenceCopy, makeBruteForecMatch(k, i-1))
 		}
 		k = j + 1
 		matchSequenceCopy = append(matchSequenceCopy, match)
 	}
 
 	if k < len(password) {
-		matchSequenceCopy = append(matchSequenceCopy, makeBruteForecMatch(k, len(password) - 1))
+		matchSequenceCopy = append(matchSequenceCopy, makeBruteForecMatch(k, len(password)-1))
 	}
 	var minEntropy float64
 	if len(password) == 0 {
 		minEntropy = float64(0)
 	} else {
-		minEntropy = upToK[len(password) - 1 ]
+		minEntropy = upToK[len(password)-1]
 	}
 
 	crackTime := roundToXDigits(entropyToCrackTime(minEntropy), 3)
-	return MinEntropyMatch{Password:password,
-		Entropy:roundToXDigits(minEntropy, 3),
-		MatchSequence:matchSequenceCopy,
-		CrackTime:crackTime,
-		CrackTimeDisplay:displayTime(crackTime),
-		Score:crackTimeToScore(crackTime)}
+	return MinEntropyMatch{Password: password,
+		Entropy:          roundToXDigits(minEntropy, 3),
+		MatchSequence:    matchSequenceCopy,
+		CrackTime:        crackTime,
+		CrackTimeDisplay: displayTime(crackTime),
+		Score:            crackTimeToScore(crackTime)}
 
 }
 func get(a []float64, i int) float64 {
@@ -198,10 +197,10 @@ func spatialEntropy(match match.Match) float64 {
 
 	//TODO: Should this be <= or just < ?
 	//Estimate the number of possible patterns w/ length L or less with t turns or less
-	for i := float64(2); i <= length + 1; i++ {
-		possibleTurns := math.Min(float64(t), i - 1)
-		for j := float64(1); j <= possibleTurns + 1; j++ {
-			x := zxcvbn_math.NChoseK(i - 1, j - 1) * s * math.Pow(d, j)
+	for i := float64(2); i <= length+1; i++ {
+		possibleTurns := math.Min(float64(t), i-1)
+		for j := float64(1); j <= possibleTurns+1; j++ {
+			x := zxcvbn_math.NChoseK(i-1, j-1) * s * math.Pow(d, j)
 			possibilities += x
 		}
 	}
@@ -214,8 +213,8 @@ func spatialEntropy(match match.Match) float64 {
 		possibilities = float64(0)
 		U := length - S
 
-		for i := float64(0); i < math.Min(S, U) + 1; i++ {
-			possibilities += zxcvbn_math.NChoseK(S + U, i)
+		for i := float64(0); i < math.Min(S, U)+1; i++ {
+			possibilities += zxcvbn_math.NChoseK(S+U, i)
 		}
 
 		entropy += math.Log2(possibilities)
@@ -231,7 +230,7 @@ func sequenceEntropy(match match.Match) float64 {
 	} else {
 		baseEntropy = math.Log2(float64(match.DictionaryLength))
 		if unicode.IsUpper(rune(firstChar)) {
-			baseEntropy ++
+			baseEntropy++
 		}
 	}
 
@@ -321,15 +320,15 @@ func displayTime(seconds float64) string {
 	if seconds < minute {
 		return "instant"
 	} else if seconds < hour {
-		return fmt.Sprintf(formater, (1 + math.Ceil(seconds / minute)), "minutes")
+		return fmt.Sprintf(formater, (1 + math.Ceil(seconds/minute)), "minutes")
 	} else if seconds < day {
-		return fmt.Sprintf(formater, (1 + math.Ceil(seconds / hour)), "hours")
+		return fmt.Sprintf(formater, (1 + math.Ceil(seconds/hour)), "hours")
 	} else if seconds < month {
-		return fmt.Sprintf(formater, (1 + math.Ceil(seconds / day)), "days")
+		return fmt.Sprintf(formater, (1 + math.Ceil(seconds/day)), "days")
 	} else if seconds < year {
-		return fmt.Sprintf(formater, (1 + math.Ceil(seconds / month)), "months")
-	}else if seconds < century {
-		return fmt.Sprintf(formater, (1 + math.Ceil(seconds / century)), "years")
+		return fmt.Sprintf(formater, (1 + math.Ceil(seconds/month)), "months")
+	} else if seconds < century {
+		return fmt.Sprintf(formater, (1 + math.Ceil(seconds/century)), "years")
 	} else {
 		return "centuries"
 	}

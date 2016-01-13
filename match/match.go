@@ -1,10 +1,11 @@
 package match
 
 type Matches []Match
-func (s Matches)Len() int {
+
+func (s Matches) Len() int {
 	return len(s)
 }
-func (s Matches)Swap(i, j int) {
+func (s Matches) Swap(i, j int) {
 	s[i], s[j] = s[j], s[i]
 }
 func (s Matches) Less(i, j int) bool {
@@ -16,19 +17,20 @@ func (s Matches) Less(i, j int) bool {
 		return false
 	}
 }
+
 type Match struct {
-	Pattern        string
-	I, J           int
-	Token          string
-	MatchedWord    string
-	Rank           float64
-	DictionaryName string
+	Pattern          string
+	I, J             int
+	Token            string
+	MatchedWord      string
+	Rank             float64
+	DictionaryName   string
 	DictionaryLength int
-	Ascending bool
-	Turns          int
-	ShiftedCount   int
-	Entropy        float64
-	RepeatedChar	string
+	Ascending        bool
+	Turns            int
+	ShiftedCount     int
+	Entropy          float64
+	RepeatedChar     string
 }
 
 type DateMatch struct {
@@ -37,5 +39,4 @@ type DateMatch struct {
 	Token            string
 	Separator        string
 	Day, Month, Year int64
-
 }

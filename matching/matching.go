@@ -1,37 +1,37 @@
 package matching
+
 import (
-	"strings"
-	"regexp"
-	"strconv"
-	"github.com/nbutton23/zxcvbn-go/frequency"
 	"github.com/nbutton23/zxcvbn-go/adjacency"
+	"github.com/nbutton23/zxcvbn-go/frequency"
 	"github.com/nbutton23/zxcvbn-go/match"
+	"regexp"
 	"sort"
-//	"github.com/deckarep/golang-set"
+	"strconv"
+	"strings"
+	//	"github.com/deckarep/golang-set"
 )
 
 var (
-	DICTIONARY_MATCHERS []func(password string) []match.Match
-	MATCHERS []func(password string) []match.Match
-	ADJACENCY_GRAPHS []adjacency.AdjacencyGraph;
+	DICTIONARY_MATCHERS         []func(password string) []match.Match
+	MATCHERS                    []func(password string) []match.Match
+	ADJACENCY_GRAPHS            []adjacency.AdjacencyGraph
 	KEYBOARD_STARTING_POSITIONS int
-	KEYBOARD_AVG_DEGREE float64
-	KEYPAD_STARTING_POSITIONS int
-	KEYPAD_AVG_DEGREE float64
-	L33T_TABLE adjacency.AdjacencyGraph
+	KEYBOARD_AVG_DEGREE         float64
+	KEYPAD_STARTING_POSITIONS   int
+	KEYPAD_AVG_DEGREE           float64
+	L33T_TABLE                  adjacency.AdjacencyGraph
 
 	SEQUENCES map[string]string
 )
 
 const (
-	DATE_RX_YEAR_SUFFIX string = `((\d{1,2})(\s|-|\/|\\|_|\.)(\d{1,2})(\s|-|\/|\\|_|\.)(19\d{2}|200\d|201\d|\d{2}))`
-	DATE_RX_YEAR_PREFIX string = `((19\d{2}|200\d|201\d|\d{2})(\s|-|/|\\|_|\.)(\d{1,2})(\s|-|/|\\|_|\.)(\d{1,2}))`
+	DATE_RX_YEAR_SUFFIX    string = `((\d{1,2})(\s|-|\/|\\|_|\.)(\d{1,2})(\s|-|\/|\\|_|\.)(19\d{2}|200\d|201\d|\d{2}))`
+	DATE_RX_YEAR_PREFIX    string = `((19\d{2}|200\d|201\d|\d{2})(\s|-|/|\\|_|\.)(\d{1,2})(\s|-|/|\\|_|\.)(\d{1,2}))`
 	DATE_WITHOUT_SEP_MATCH string = `\d{4,8}`
 )
 
-
 func init() {
-loadFrequencyList()
+	loadFrequencyList()
 }
 
 func Omnimatch(password string, userInputs []string) (matches []match.Match) {
@@ -83,9 +83,7 @@ func loadFrequencyList() {
 	MATCHERS = append(MATCHERS, repeatMatch)
 	MATCHERS = append(MATCHERS, SequenceMatch)
 
-
 }
-
 
 func buildDictMatcher(dictName string, rankedDict map[string]int) func(password string) []match.Match {
 	return func(password string) []match.Match {
@@ -105,15 +103,15 @@ func dictionaryMatch(password string, dictionaryName string, rankedDict map[stri
 
 	for i := 0; i < length; i++ {
 		for j := i; j < length; j++ {
-			word := pwLower[i:j + 1]
+			word := pwLower[i : j+1]
 			if val, ok := rankedDict[word]; ok {
-				results = append(results, match.Match{Pattern:"dictionary",
-					DictionaryName:dictionaryName,
-					I:i,
-					J:j,
-					Token:password[i:j + 1],
-					MatchedWord:word,
-					Rank:float64(val)})
+				results = append(results, match.Match{Pattern: "dictionary",
+					DictionaryName: dictionaryName,
+					I:              i,
+					J:              j,
+					Token:          password[i : j+1],
+					MatchedWord:    word,
+					Rank:           float64(val)})
 			}
 		}
 	}
@@ -160,10 +158,9 @@ func DateSepMatch(password string) []match.DateMatch {
 		day, _ := strconv.ParseInt(splitV[0][4], 10, 16)
 		month, _ := strconv.ParseInt(splitV[0][2], 10, 16)
 		year, _ := strconv.ParseInt(splitV[0][6], 10, 16)
-		match := match.DateMatch{Day:day, Month:month, Year:year, Separator:splitV[0][5], I:i, J:j }
+		match := match.DateMatch{Day: day, Month: month, Year: year, Separator: splitV[0][5], I: i, J: j}
 		matches = append(matches, match)
 	}
-
 
 	matcher = regexp.MustCompile(DATE_RX_YEAR_PREFIX)
 	for _, v := range matcher.FindAllString(password, len(password)) {
@@ -173,7 +170,7 @@ func DateSepMatch(password string) []match.DateMatch {
 		day, _ := strconv.ParseInt(splitV[0][4], 10, 16)
 		month, _ := strconv.ParseInt(splitV[0][6], 10, 16)
 		year, _ := strconv.ParseInt(splitV[0][2], 10, 16)
-		match := match.DateMatch{Day:day, Month:month, Year:year, Separator:splitV[0][5], I:i, J:j }
+		match := match.DateMatch{Day: day, Month: month, Year: year, Separator: splitV[0][5], I: i, J: j}
 		matches = append(matches, match)
 	}
 
@@ -190,11 +187,13 @@ func DateSepMatch(password string) []match.DateMatch {
 	return out
 
 }
+
 type DateMatchCandidate struct {
 	DayMonth string
 	Year     string
 	I, J     int
 }
+
 //TODO I think Im doing this wrong.
 func dateWithoutSepMatch(password string) (matches []match.DateMatch) {
 	matcher := regexp.MustCompile(DATE_WITHOUT_SEP_MATCH)
@@ -210,14 +209,14 @@ func dateWithoutSepMatch(password string) (matches []match.DateMatch) {
 			candidatesRoundOne = append(candidatesRoundOne, buildDateMatchCandidate(v[2:], v[0:2], i, j))
 
 			//2-digityear suffix
-			candidatesRoundOne = append(candidatesRoundOne, buildDateMatchCandidate(v[0:lastIndex - 2], v[lastIndex - 2:], i, j))
+			candidatesRoundOne = append(candidatesRoundOne, buildDateMatchCandidate(v[0:lastIndex-2], v[lastIndex-2:], i, j))
 		}
 		if length >= 6 {
 			//4-digit year prefix
 			candidatesRoundOne = append(candidatesRoundOne, buildDateMatchCandidate(v[4:], v[0:4], i, j))
 
 			//4-digit year sufix
-			candidatesRoundOne = append(candidatesRoundOne, buildDateMatchCandidate(v[0:lastIndex - 4], v[lastIndex - 4:], i, j))
+			candidatesRoundOne = append(candidatesRoundOne, buildDateMatchCandidate(v[0:lastIndex-4], v[lastIndex-4:], i, j))
 		}
 
 		var candidatesRoundTwo []match.DateMatch
@@ -232,7 +231,7 @@ func dateWithoutSepMatch(password string) (matches []match.DateMatch) {
 }
 
 func buildDateMatchCandidate(dayMonth, year string, i, j int) DateMatchCandidate {
-	return DateMatchCandidate{DayMonth: dayMonth, Year:year, I:i, J:j}
+	return DateMatchCandidate{DayMonth: dayMonth, Year: year, I: i, J: j}
 }
 
 func buildDateMatchCandidateTwo(day, month byte, year string, i, j int) match.DateMatch {
@@ -242,9 +241,8 @@ func buildDateMatchCandidateTwo(day, month byte, year string, i, j int) match.Da
 	intMonth, _ := strconv.ParseInt(sMonth, 10, 16)
 	intYear, _ := strconv.ParseInt(year, 10, 16)
 
-	return match.DateMatch{Day:intDay, Month:intMonth, Year:intYear, I:i, J:j}
+	return match.DateMatch{Day: intDay, Month: intMonth, Year: intYear, I: i, J: j}
 }
-
 
 func spatialMatch(password string) (matches []match.Match) {
 	for _, graph := range ADJACENCY_GRAPHS {
@@ -254,14 +252,14 @@ func spatialMatch(password string) (matches []match.Match) {
 }
 
 func spatialMatchHelper(password string, graph adjacency.AdjacencyGraph) (matches []match.Match) {
-	for i := 0; i < len(password) - 1; {
+	for i := 0; i < len(password)-1; {
 		j := i + 1
 		lastDirection := -99 //and int that it should never be!
 		turns := 0
 		shiftedCount := 0
 
-		for ;; {
-			prevChar := password[j - 1]
+		for {
+			prevChar := password[j-1]
 			found := false
 			foundDirection := -1
 			curDirection := -1
@@ -300,8 +298,8 @@ func spatialMatchHelper(password string, graph adjacency.AdjacencyGraph) (matche
 			} else {
 				//					otherwise push the pattern discovered so far, if any...
 				//					don't consider length 1 or 2 chains.
-				if j - i > 2 {
-					matches = append(matches, match.Match{Pattern:"spatial", I:i, J:j - 1, Token:password[i:j], DictionaryName:graph.Name, Turns:turns, ShiftedCount:shiftedCount })
+				if j-i > 2 {
+					matches = append(matches, match.Match{Pattern: "spatial", I: i, J: j - 1, Token: password[i:j], DictionaryName: graph.Name, Turns: turns, ShiftedCount: shiftedCount})
 				}
 				//					. . . and then start a new search from the rest of the password
 				i = j
@@ -364,11 +362,11 @@ func repeatMatch(password string) []match.Match {
 			iPos := i - currentStreak
 			jPos := i - 1
 			matches = append(matches, match.Match{
-				Pattern:"repeat",
-				I:iPos,
-				J:jPos,
-				Token:password[iPos:jPos + 1],
-				RepeatedChar:prev})
+				Pattern:      "repeat",
+				I:            iPos,
+				J:            jPos,
+				Token:        password[iPos : jPos+1],
+				RepeatedChar: prev})
 			currentStreak = 1
 		} else {
 			currentStreak = 1
@@ -381,11 +379,11 @@ func repeatMatch(password string) []match.Match {
 		iPos := i - currentStreak + 1
 		jPos := i
 		matches = append(matches, match.Match{
-			Pattern:"repeat",
-			I:iPos,
-			J:jPos,
-			Token:password[iPos:jPos + 1],
-			RepeatedChar:prev})
+			Pattern:      "repeat",
+			I:            iPos,
+			J:            jPos,
+			Token:        password[iPos : jPos+1],
+			RepeatedChar: prev})
 	}
 	return matches
 }
@@ -419,22 +417,22 @@ func SequenceMatch(password string) []match.Match {
 		}
 
 		if seq != "" {
-			for ;; {
+			for {
 				var prevN, curN int
 				if j < len(password) {
-					prevChar, curChar := password[j - 1], password[j]
+					prevChar, curChar := password[j-1], password[j]
 					prevN, curN = strings.Index(seq, string(prevChar)), strings.Index(seq, string(curChar))
 				}
 
-				if j == len(password) || curN - prevN != seqDirection {
-					if j - i > 2 {
-						matches = append(matches, match.Match{Pattern:"sequence",
-							I:i,
-							J:j-1,
-							Token:password[i:j],
-							DictionaryName:seqName,
+				if j == len(password) || curN-prevN != seqDirection {
+					if j-i > 2 {
+						matches = append(matches, match.Match{Pattern: "sequence",
+							I:                i,
+							J:                j - 1,
+							Token:            password[i:j],
+							DictionaryName:   seqName,
 							DictionaryLength: len(seq),
-							Ascending:(seqDirection == 1)})
+							Ascending:        (seqDirection == 1)})
 					}
 					break
 				} else {

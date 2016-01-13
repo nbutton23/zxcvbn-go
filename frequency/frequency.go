@@ -1,8 +1,9 @@
 package frequency
+
 import (
-	"log"
 	"encoding/json"
 	"github.com/nbutton23/zxcvbn-go/data"
+	"log"
 )
 
 type FrequencyList struct {
@@ -11,6 +12,7 @@ type FrequencyList struct {
 }
 
 var FrequencyLists = make(map[string]FrequencyList)
+
 func init() {
 	maleFilePath := getAsset("data/MaleNames.json")
 	femaleFilePath := getAsset("data/FemaleNames.json")
@@ -35,7 +37,7 @@ func getAsset(name string) []byte {
 }
 func GetStringListFromAsset(data []byte, name string) FrequencyList {
 
-	var tempList FrequencyList;
+	var tempList FrequencyList
 	err := json.Unmarshal(data, &tempList)
 	if err != nil {
 		log.Fatal(err)
