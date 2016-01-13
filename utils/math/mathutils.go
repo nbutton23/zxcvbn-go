@@ -1,11 +1,10 @@
 package zxcvbn_math
+
 import "math"
-
-
 
 /**
 I am surprised that I have to define these. . . Maybe i just didn't look hard enough for a lib.
- */
+*/
 
 //http://blog.plover.com/math/choose.html
 func NChoseK(n, k float64) float64 {

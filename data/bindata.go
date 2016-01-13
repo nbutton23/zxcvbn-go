@@ -19,11 +19,11 @@ import (
 	"compress/gzip"
 	"fmt"
 	"io"
-	"strings"
-	"os"
-	"time"
 	"io/ioutil"
+	"os"
 	"path/filepath"
+	"strings"
+	"time"
 )
 
 func bindataRead(data []byte, name string) ([]byte, error) {
@@ -52,9 +52,9 @@ type asset struct {
 }
 
 type bindataFileInfo struct {
-	name string
-	size int64
-	mode os.FileMode
+	name    string
+	size    int64
+	mode    os.FileMode
 	modTime time.Time
 }
 
@@ -93,7 +93,7 @@ func dataDvorakJson() (*asset, error) {
 	}
 
 	info := bindataFileInfo{name: "data/Dvorak.json", size: 8398, mode: os.FileMode(420), modTime: time.Unix(1444169890, 0)}
-	a := &asset{bytes: bytes, info:  info}
+	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
 
@@ -113,7 +113,7 @@ func dataEnglishJson() (*asset, error) {
 	}
 
 	info := bindataFileInfo{name: "data/English.json", size: 341560, mode: os.FileMode(420), modTime: time.Unix(1444169890, 0)}
-	a := &asset{bytes: bytes, info:  info}
+	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
 
@@ -133,7 +133,7 @@ func dataFemalenamesJson() (*asset, error) {
 	}
 
 	info := bindataFileInfo{name: "data/FemaleNames.json", size: 53909, mode: os.FileMode(420), modTime: time.Unix(1444169890, 0)}
-	a := &asset{bytes: bytes, info:  info}
+	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
 
@@ -153,7 +153,7 @@ func dataKeypadJson() (*asset, error) {
 	}
 
 	info := bindataFileInfo{name: "data/Keypad.json", size: 1639, mode: os.FileMode(420), modTime: time.Unix(1444169890, 0)}
-	a := &asset{bytes: bytes, info:  info}
+	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
 
@@ -173,7 +173,7 @@ func dataL33tJson() (*asset, error) {
 	}
 
 	info := bindataFileInfo{name: "data/L33t.json", size: 477, mode: os.FileMode(420), modTime: time.Unix(1444170193, 0)}
-	a := &asset{bytes: bytes, info:  info}
+	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
 
@@ -193,7 +193,7 @@ func dataMackeypadJson() (*asset, error) {
 	}
 
 	info := bindataFileInfo{name: "data/MacKeypad.json", size: 1744, mode: os.FileMode(420), modTime: time.Unix(1444169890, 0)}
-	a := &asset{bytes: bytes, info:  info}
+	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
 
@@ -213,7 +213,7 @@ func dataMalenamesJson() (*asset, error) {
 	}
 
 	info := bindataFileInfo{name: "data/MaleNames.json", size: 11791, mode: os.FileMode(420), modTime: time.Unix(1444169890, 0)}
-	a := &asset{bytes: bytes, info:  info}
+	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
 
@@ -233,7 +233,7 @@ func dataPasswordsJson() (*asset, error) {
 	}
 
 	info := bindataFileInfo{name: "data/Passwords.json", size: 67534, mode: os.FileMode(420), modTime: time.Unix(1444169890, 0)}
-	a := &asset{bytes: bytes, info:  info}
+	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
 
@@ -253,7 +253,7 @@ func dataQwertyJson() (*asset, error) {
 	}
 
 	info := bindataFileInfo{name: "data/Qwerty.json", size: 8398, mode: os.FileMode(420), modTime: time.Unix(1444169890, 0)}
-	a := &asset{bytes: bytes, info:  info}
+	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
 
@@ -273,7 +273,7 @@ func dataSurnamesJson() (*asset, error) {
 	}
 
 	info := bindataFileInfo{name: "data/Surnames.json", size: 396413, mode: os.FileMode(420), modTime: time.Unix(1444169890, 0)}
-	a := &asset{bytes: bytes, info:  info}
+	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
 
@@ -296,7 +296,7 @@ func Asset(name string) ([]byte, error) {
 // It simplifies safe initialization of global variables.
 func MustAsset(name string) []byte {
 	a, err := Asset(name)
-	if (err != nil) {
+	if err != nil {
 		panic("asset: Asset(" + name + "): " + err.Error())
 	}
 
@@ -329,16 +329,16 @@ func AssetNames() []string {
 
 // _bindata is a table, holding each asset generator, mapped to its name.
 var _bindata = map[string]func() (*asset, error){
-	"data/Dvorak.json": dataDvorakJson,
-	"data/English.json": dataEnglishJson,
+	"data/Dvorak.json":      dataDvorakJson,
+	"data/English.json":     dataEnglishJson,
 	"data/FemaleNames.json": dataFemalenamesJson,
-	"data/Keypad.json": dataKeypadJson,
-	"data/L33t.json": dataL33tJson,
-	"data/MacKeypad.json": dataMackeypadJson,
-	"data/MaleNames.json": dataMalenamesJson,
-	"data/Passwords.json": dataPasswordsJson,
-	"data/Qwerty.json": dataQwertyJson,
-	"data/Surnames.json": dataSurnamesJson,
+	"data/Keypad.json":      dataKeypadJson,
+	"data/L33t.json":        dataL33tJson,
+	"data/MacKeypad.json":   dataMackeypadJson,
+	"data/MaleNames.json":   dataMalenamesJson,
+	"data/Passwords.json":   dataPasswordsJson,
+	"data/Qwerty.json":      dataQwertyJson,
+	"data/Surnames.json":    dataSurnamesJson,
 }
 
 // AssetDir returns the file names below a certain
@@ -377,78 +377,68 @@ func AssetDir(name string) ([]string, error) {
 }
 
 type bintree struct {
-	Func func() (*asset, error)
+	Func     func() (*asset, error)
 	Children map[string]*bintree
 }
+
 var _bintree = &bintree{nil, map[string]*bintree{
 	"data": &bintree{nil, map[string]*bintree{
-		"Dvorak.json": &bintree{dataDvorakJson, map[string]*bintree{
-		}},
-		"English.json": &bintree{dataEnglishJson, map[string]*bintree{
-		}},
-		"FemaleNames.json": &bintree{dataFemalenamesJson, map[string]*bintree{
-		}},
-		"Keypad.json": &bintree{dataKeypadJson, map[string]*bintree{
-		}},
-		"L33t.json": &bintree{dataL33tJson, map[string]*bintree{
-		}},
-		"MacKeypad.json": &bintree{dataMackeypadJson, map[string]*bintree{
-		}},
-		"MaleNames.json": &bintree{dataMalenamesJson, map[string]*bintree{
-		}},
-		"Passwords.json": &bintree{dataPasswordsJson, map[string]*bintree{
-		}},
-		"Qwerty.json": &bintree{dataQwertyJson, map[string]*bintree{
-		}},
-		"Surnames.json": &bintree{dataSurnamesJson, map[string]*bintree{
-		}},
+		"Dvorak.json":      &bintree{dataDvorakJson, map[string]*bintree{}},
+		"English.json":     &bintree{dataEnglishJson, map[string]*bintree{}},
+		"FemaleNames.json": &bintree{dataFemalenamesJson, map[string]*bintree{}},
+		"Keypad.json":      &bintree{dataKeypadJson, map[string]*bintree{}},
+		"L33t.json":        &bintree{dataL33tJson, map[string]*bintree{}},
+		"MacKeypad.json":   &bintree{dataMackeypadJson, map[string]*bintree{}},
+		"MaleNames.json":   &bintree{dataMalenamesJson, map[string]*bintree{}},
+		"Passwords.json":   &bintree{dataPasswordsJson, map[string]*bintree{}},
+		"Qwerty.json":      &bintree{dataQwertyJson, map[string]*bintree{}},
+		"Surnames.json":    &bintree{dataSurnamesJson, map[string]*bintree{}},
 	}},
 }}
 
 // RestoreAsset restores an asset under the given directory
 func RestoreAsset(dir, name string) error {
-        data, err := Asset(name)
-        if err != nil {
-                return err
-        }
-        info, err := AssetInfo(name)
-        if err != nil {
-                return err
-        }
-        err = os.MkdirAll(_filePath(dir, filepath.Dir(name)), os.FileMode(0755))
-        if err != nil {
-                return err
-        }
-        err = ioutil.WriteFile(_filePath(dir, name), data, info.Mode())
-        if err != nil {
-                return err
-        }
-        err = os.Chtimes(_filePath(dir, name), info.ModTime(), info.ModTime())
-        if err != nil {
-                return err
-        }
-        return nil
+	data, err := Asset(name)
+	if err != nil {
+		return err
+	}
+	info, err := AssetInfo(name)
+	if err != nil {
+		return err
+	}
+	err = os.MkdirAll(_filePath(dir, filepath.Dir(name)), os.FileMode(0755))
+	if err != nil {
+		return err
+	}
+	err = ioutil.WriteFile(_filePath(dir, name), data, info.Mode())
+	if err != nil {
+		return err
+	}
+	err = os.Chtimes(_filePath(dir, name), info.ModTime(), info.ModTime())
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // RestoreAssets restores an asset under the given directory recursively
 func RestoreAssets(dir, name string) error {
-        children, err := AssetDir(name)
-        // File
-        if err != nil {
-                return RestoreAsset(dir, name)
-        }
-        // Dir
-        for _, child := range children {
-                err = RestoreAssets(dir, filepath.Join(name, child))
-                if err != nil {
-                        return err
-                }
-        }
-        return nil
+	children, err := AssetDir(name)
+	// File
+	if err != nil {
+		return RestoreAsset(dir, name)
+	}
+	// Dir
+	for _, child := range children {
+		err = RestoreAssets(dir, filepath.Join(name, child))
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func _filePath(dir, name string) string {
-        cannonicalName := strings.Replace(name, "\\", "/", -1)
-        return filepath.Join(append([]string{dir}, strings.Split(cannonicalName, "/")...)...)
+	cannonicalName := strings.Replace(name, "\\", "/", -1)
+	return filepath.Join(append([]string{dir}, strings.Split(cannonicalName, "/")...)...)
 }
-

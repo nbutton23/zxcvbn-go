@@ -1,20 +1,20 @@
 package adjacency
+
 import (
-	"log"
 	"encoding/json"
-//	"fmt"
+	"log"
+	//	"fmt"
 	"github.com/nbutton23/zxcvbn-go/data"
 )
 
-
 type AdjacencyGraph struct {
-	Graph map[string][]string
+	Graph         map[string][]string
 	averageDegree float64
-	Name string
+	Name          string
 }
 
+var AdjacencyGph = make(map[string]AdjacencyGraph)
 
-var AdjacencyGph = make(map[string]AdjacencyGraph);
 func init() {
 	log.SetFlags(log.Lshortfile)
 	AdjacencyGph["qwerty"] = BuildQwerty()
@@ -54,7 +54,7 @@ func BuildMacKeypad() AdjacencyGraph {
 
 func GetAdjancencyGraphFromFile(data []byte, name string) AdjacencyGraph {
 
-	var graph AdjacencyGraph;
+	var graph AdjacencyGraph
 	err := json.Unmarshal(data, &graph)
 	if err != nil {
 		log.Fatal(err)
@@ -66,7 +66,7 @@ func GetAdjancencyGraphFromFile(data []byte, name string) AdjacencyGraph {
 //on qwerty, 'g' has degree 6, being adjacent to 'ftyhbv'. '\' has degree 1.
 //this calculates the average over all keys.
 //TODO double check that i ported this correctly scoring.coffee ln 5
-func (adjGrp AdjacencyGraph) CalculateAvgDegree() (float64) {
+func (adjGrp AdjacencyGraph) CalculateAvgDegree() float64 {
 	if adjGrp.averageDegree != float64(0) {
 		return adjGrp.averageDegree
 	}
@@ -83,8 +83,7 @@ func (adjGrp AdjacencyGraph) CalculateAvgDegree() (float64) {
 
 	}
 
-	adjGrp.averageDegree = avg/count
+	adjGrp.averageDegree = avg / count
 
 	return adjGrp.averageDegree
 }
-
