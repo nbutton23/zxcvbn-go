@@ -1,7 +1,8 @@
 package zxcvbn_math
+
 import (
+	"github.com/nbutton23/zxcvbn-go/Godeps/_workspace/src/github.com/stretchr/testify/assert"
 	"testing"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestNchoseK100and2(t *testing.T) {

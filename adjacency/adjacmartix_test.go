@@ -1,34 +1,33 @@
 package adjacency
 
 import (
+	"github.com/nbutton23/zxcvbn-go/Godeps/_workspace/src/github.com/stretchr/testify/assert"
 	"testing"
-	"github.com/stretchr/testify/assert"
 )
 
 /*
 nbutton: Really the value is not as important to me than they don't change, which happened during development.
- */
+*/
 func TestCalculateDegreeQwert(t *testing.T) {
-	avgDegreeQwert := buildQwerty().CalculateAvgDegree()
+	avgDegreeQwert := BuildQwerty().CalculateAvgDegree()
 
 	assert.Equal(t, float32(1.531915), avgDegreeQwert, "Avg degree for qwerty should be 1.531915")
 }
 
 func TestCalculateDegreeDvorak(t *testing.T) {
-	avgDegreeQwert := buildDvorak().CalculateAvgDegree()
+	avgDegreeQwert := BuildDvorak().CalculateAvgDegree()
 
 	assert.Equal(t, float32(1.531915), avgDegreeQwert, "Avg degree for dvorak should be 1.531915")
 }
 
 func TestCalculateDegreeKeypad(t *testing.T) {
-	avgDegreeQwert := buildKeypad().CalculateAvgDegree()
+	avgDegreeQwert := BuildKeypad().CalculateAvgDegree()
 
 	assert.Equal(t, float32(0.62222224), avgDegreeQwert, "Avg degree for keypad should be 0.62222224")
 }
 
 func TestCalculateDegreeMacKepad(t *testing.T) {
-	avgDegreeQwert := buildMacKeypad().CalculateAvgDegree()
+	avgDegreeQwert := BuildMacKeypad().CalculateAvgDegree()
 
 	assert.Equal(t, float32(0.6458333), avgDegreeQwert, "Avg degree for mackeyPad should be 0.6458333")
 }
-
