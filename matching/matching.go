@@ -65,13 +65,13 @@ func loadFrequencyList() {
 	KEYPAD_AVG_DEGREE = adjacency.AdjacencyGph["keypad"].CalculateAvgDegree()
 	KEYPAD_STARTING_POSITIONS = len(adjacency.AdjacencyGph["keypad"].Graph)
 
-	ADJACENCY_GRAPHS = append(ADJACENCY_GRAPHS, adjacency.AdjacencyGph["querty"])
+	ADJACENCY_GRAPHS = append(ADJACENCY_GRAPHS, adjacency.AdjacencyGph["qwerty"])
 	ADJACENCY_GRAPHS = append(ADJACENCY_GRAPHS, adjacency.AdjacencyGph["dvorak"])
 	ADJACENCY_GRAPHS = append(ADJACENCY_GRAPHS, adjacency.AdjacencyGph["keypad"])
 	ADJACENCY_GRAPHS = append(ADJACENCY_GRAPHS, adjacency.AdjacencyGph["macKeypad"])
-	//
-	//	l33tFilePath, _ := filepath.Abs("adjacency/L33t.json")
-	//	L33T_TABLE = adjacency.GetAdjancencyGraphFromFile(l33tFilePath, "l33t")
+
+	//l33tFilePath, _ := filepath.Abs("adjacency/L33t.json")
+	//L33T_TABLE = adjacency.GetAdjancencyGraphFromFile(l33tFilePath, "l33t")
 
 	SEQUENCES = make(map[string]string)
 	SEQUENCES["lower"] = "abcdefghijklmnopqrstuvwxyz"
@@ -79,8 +79,8 @@ func loadFrequencyList() {
 	SEQUENCES["digits"] = "0123456789"
 
 	MATCHERS = append(MATCHERS, DICTIONARY_MATCHERS...)
-	MATCHERS = append(MATCHERS, spatialMatch)
-	MATCHERS = append(MATCHERS, repeatMatch)
+	MATCHERS = append(MATCHERS, SpatialMatch)
+	MATCHERS = append(MATCHERS, RepeatMatch)
 	MATCHERS = append(MATCHERS, SequenceMatch)
 
 }
@@ -244,17 +244,22 @@ func buildDateMatchCandidateTwo(day, month byte, year string, i, j int) match.Da
 	return match.DateMatch{Day: intDay, Month: intMonth, Year: intYear, I: i, J: j}
 }
 
-func spatialMatch(password string) (matches []match.Match) {
+//TODO: This is not working.
+//It appears that the Adjacency graph data is incorrect. Need to get a new copy from python-zxcvbn.
+func SpatialMatch(password string) (matches []match.Match) {
 	for _, graph := range ADJACENCY_GRAPHS {
-		matches = append(matches, spatialMatchHelper(password, graph)...)
+		if graph.Graph != nil {
+			matches = append(matches, spatialMatchHelper(password, graph)...)
+		}
 	}
 	return matches
 }
 
 func spatialMatchHelper(password string, graph adjacency.AdjacencyGraph) (matches []match.Match) {
+
 	for i := 0; i < len(password)-1; {
 		j := i + 1
-		lastDirection := -99 //and int that it should never be!
+		lastDirection := -99 //an int that it should never be!
 		turns := 0
 		shiftedCount := 0
 
@@ -263,8 +268,9 @@ func spatialMatchHelper(password string, graph adjacency.AdjacencyGraph) (matche
 			found := false
 			foundDirection := -1
 			curDirection := -1
+			//My graphs seem to be wrong. . . and where the hell is qwerty
 			adjacents := graph.Graph[string(prevChar)]
-			//				Consider growing pattern by one character if j hasn't gone over the edge
+			//Consider growing pattern by one character if j hasn't gone over the edge
 			if j < len(password) {
 				curChar := password[j]
 				for _, adj := range adjacents {
@@ -275,15 +281,14 @@ func spatialMatchHelper(password string, graph adjacency.AdjacencyGraph) (matche
 						foundDirection = curDirection
 
 						if strings.Index(adj, string(curChar)) == 1 {
-							//								index 1 in the adjacency means the key is shifted, 0 means unshifted: A vs a, % vs 5, etc.
-							//								for example, 'q' is adjacent to the entry '2@'. @ is shifted w/ index 1, 2 is unshifted.
-
+							//index 1 in the adjacency means the key is shifted, 0 means unshifted: A vs a, % vs 5, etc.
+							//for example, 'q' is adjacent to the entry '2@'. @ is shifted w/ index 1, 2 is unshifted.
 							shiftedCount += 1
 						}
 
 						if lastDirection != foundDirection {
-							//								adding a turn is correct even in the initial case when last_direction is null:
-							//								every spatial pattern starts with a turn.
+							//adding a turn is correct even in the initial case when last_direction is null:
+							//every spatial pattern starts with a turn.
 							turns += 1
 							lastDirection = foundDirection
 						}
@@ -292,16 +297,16 @@ func spatialMatchHelper(password string, graph adjacency.AdjacencyGraph) (matche
 				}
 			}
 
-			//				if the current pattern continued, extend j and try to grow again
+			//if the current pattern continued, extend j and try to grow again
 			if found {
 				j += 1
 			} else {
-				//					otherwise push the pattern discovered so far, if any...
-				//					don't consider length 1 or 2 chains.
+				//otherwise push the pattern discovered so far, if any...
+				//don't consider length 1 or 2 chains.
 				if j-i > 2 {
 					matches = append(matches, match.Match{Pattern: "spatial", I: i, J: j - 1, Token: password[i:j], DictionaryName: graph.Name, Turns: turns, ShiftedCount: shiftedCount})
 				}
-				//					. . . and then start a new search from the rest of the password
+				//. . . and then start a new search from the rest of the password
 				i = j
 				break
 			}
@@ -340,7 +345,7 @@ func relevantL33tSubtable(password string) adjacency.AdjacencyGraph {
 //	}
 //}
 
-func repeatMatch(password string) []match.Match {
+func RepeatMatch(password string) []match.Match {
 	var matches []match.Match
 
 	//Loop through password. if current == prev currentStreak++ else if currentStreak > 2 {buildMatch; currentStreak = 1} prev = current
@@ -355,7 +360,7 @@ func repeatMatch(password string) []match.Match {
 			continue
 		}
 
-		if current == prev {
+		if strings.ToLower(current) == strings.ToLower(prev) {
 			currentStreak++
 
 		} else if currentStreak > 2 {
