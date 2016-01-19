@@ -70,7 +70,7 @@ func MinimumEntropyMatchSequence(password string, matches []match.Match) MinEntr
 		}
 	}
 
-	//		walk backwards and decode the best sequence
+	//walk backwards and decode the best sequence
 	var matchSequence []match.Match
 	passwordLen := len(password)
 	passwordLen--

@@ -92,7 +92,7 @@ func dataDvorakJson() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "data/Dvorak.json", size: 8398, mode: os.FileMode(420), modTime: time.Unix(1444169890, 0)}
+	info := bindataFileInfo{name: "data/Dvorak.json", size: 8398, mode: os.FileMode(420), modTime: time.Unix(1452717629, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -112,7 +112,7 @@ func dataEnglishJson() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "data/English.json", size: 341560, mode: os.FileMode(420), modTime: time.Unix(1444169890, 0)}
+	info := bindataFileInfo{name: "data/English.json", size: 341560, mode: os.FileMode(420), modTime: time.Unix(1452717629, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -132,7 +132,7 @@ func dataFemalenamesJson() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "data/FemaleNames.json", size: 53909, mode: os.FileMode(420), modTime: time.Unix(1444169890, 0)}
+	info := bindataFileInfo{name: "data/FemaleNames.json", size: 53909, mode: os.FileMode(420), modTime: time.Unix(1452717629, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -152,7 +152,7 @@ func dataKeypadJson() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "data/Keypad.json", size: 1639, mode: os.FileMode(420), modTime: time.Unix(1444169890, 0)}
+	info := bindataFileInfo{name: "data/Keypad.json", size: 1639, mode: os.FileMode(420), modTime: time.Unix(1452717629, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -172,7 +172,7 @@ func dataL33tJson() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "data/L33t.json", size: 477, mode: os.FileMode(420), modTime: time.Unix(1444170193, 0)}
+	info := bindataFileInfo{name: "data/L33t.json", size: 477, mode: os.FileMode(420), modTime: time.Unix(1452717629, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -192,7 +192,7 @@ func dataMackeypadJson() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "data/MacKeypad.json", size: 1744, mode: os.FileMode(420), modTime: time.Unix(1444169890, 0)}
+	info := bindataFileInfo{name: "data/MacKeypad.json", size: 1744, mode: os.FileMode(420), modTime: time.Unix(1452717629, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -212,7 +212,7 @@ func dataMalenamesJson() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "data/MaleNames.json", size: 11791, mode: os.FileMode(420), modTime: time.Unix(1444169890, 0)}
+	info := bindataFileInfo{name: "data/MaleNames.json", size: 11791, mode: os.FileMode(420), modTime: time.Unix(1452717629, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -232,7 +232,7 @@ func dataPasswordsJson() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "data/Passwords.json", size: 67534, mode: os.FileMode(420), modTime: time.Unix(1444169890, 0)}
+	info := bindataFileInfo{name: "data/Passwords.json", size: 67534, mode: os.FileMode(420), modTime: time.Unix(1452717629, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -252,7 +252,7 @@ func dataQwertyJson() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "data/Qwerty.json", size: 8398, mode: os.FileMode(420), modTime: time.Unix(1444169890, 0)}
+	info := bindataFileInfo{name: "data/Qwerty.json", size: 8398, mode: os.FileMode(420), modTime: time.Unix(1452717629, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -272,7 +272,7 @@ func dataSurnamesJson() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "data/Surnames.json", size: 396413, mode: os.FileMode(420), modTime: time.Unix(1444169890, 0)}
+	info := bindataFileInfo{name: "data/Surnames.json", size: 396413, mode: os.FileMode(420), modTime: time.Unix(1452717629, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
