@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"strings"
 	//	"github.com/deckarep/golang-set"
+	"github.com/nbutton23/zxcvbn-go/entropy"
 )
 
 var (
@@ -105,13 +106,15 @@ func dictionaryMatch(password string, dictionaryName string, rankedDict map[stri
 		for j := i; j < length; j++ {
 			word := pwLower[i : j+1]
 			if val, ok := rankedDict[word]; ok {
-				results = append(results, match.Match{Pattern: "dictionary",
+				matchDic := match.Match{Pattern: "dictionary",
 					DictionaryName: dictionaryName,
 					I:              i,
 					J:              j,
 					Token:          password[i : j+1],
-					MatchedWord:    word,
-					Rank:           float64(val)})
+				}
+				matchDic.Entropy = entropy.DictionaryEntropy(matchDic, float64(val))
+
+				results = append(results, matchDic)
 			}
 		}
 	}
@@ -244,8 +247,6 @@ func buildDateMatchCandidateTwo(day, month byte, year string, i, j int) match.Da
 	return match.DateMatch{Day: intDay, Month: intMonth, Year: intYear, I: i, J: j}
 }
 
-//TODO: This is not working.
-//It appears that the Adjacency graph data is incorrect. Need to get a new copy from python-zxcvbn.
 func SpatialMatch(password string) (matches []match.Match) {
 	for _, graph := range ADJACENCY_GRAPHS {
 		if graph.Graph != nil {
@@ -304,7 +305,9 @@ func spatialMatchHelper(password string, graph adjacency.AdjacencyGraph) (matche
 				//otherwise push the pattern discovered so far, if any...
 				//don't consider length 1 or 2 chains.
 				if j-i > 2 {
-					matches = append(matches, match.Match{Pattern: "spatial", I: i, J: j - 1, Token: password[i:j], DictionaryName: graph.Name, Turns: turns, ShiftedCount: shiftedCount})
+					matchSpc := match.Match{Pattern: "spatial", I: i, J: j - 1, Token: password[i:j], DictionaryName: graph.Name}
+					matchSpc.Entropy = entropy.SpatialEntropy(matchSpc, turns, shiftedCount)
+					matches = append(matches, matchSpc)
 				}
 				//. . . and then start a new search from the rest of the password
 				i = j
@@ -366,12 +369,14 @@ func RepeatMatch(password string) []match.Match {
 		} else if currentStreak > 2 {
 			iPos := i - currentStreak
 			jPos := i - 1
-			matches = append(matches, match.Match{
-				Pattern:      "repeat",
-				I:            iPos,
-				J:            jPos,
-				Token:        password[iPos : jPos+1],
-				RepeatedChar: prev})
+			matchRepeat := match.Match{
+				Pattern:        "repeat",
+				I:              iPos,
+				J:              jPos,
+				Token:          password[iPos : jPos+1],
+				DictionaryName: prev}
+			matchRepeat.Entropy = entropy.RepeatEntropy(matchRepeat)
+			matches = append(matches, matchRepeat)
 			currentStreak = 1
 		} else {
 			currentStreak = 1
@@ -383,12 +388,14 @@ func RepeatMatch(password string) []match.Match {
 	if currentStreak > 2 {
 		iPos := i - currentStreak + 1
 		jPos := i
-		matches = append(matches, match.Match{
-			Pattern:      "repeat",
-			I:            iPos,
-			J:            jPos,
-			Token:        password[iPos : jPos+1],
-			RepeatedChar: prev})
+		matchRepeat := match.Match{
+			Pattern:        "repeat",
+			I:              iPos,
+			J:              jPos,
+			Token:          password[iPos : jPos+1],
+			DictionaryName: prev}
+		matchRepeat.Entropy = entropy.RepeatEntropy(matchRepeat)
+		matches = append(matches, matchRepeat)
 	}
 	return matches
 }
@@ -431,13 +438,16 @@ func SequenceMatch(password string) []match.Match {
 
 				if j == len(password) || curN-prevN != seqDirection {
 					if j-i > 2 {
-						matches = append(matches, match.Match{Pattern: "sequence",
-							I:                i,
-							J:                j - 1,
-							Token:            password[i:j],
-							DictionaryName:   seqName,
-							DictionaryLength: len(seq),
-							Ascending:        (seqDirection == 1)})
+						matchSequence := match.Match{
+							Pattern:        "sequence",
+							I:              i,
+							J:              j - 1,
+							Token:          password[i:j],
+							DictionaryName: seqName,
+						}
+
+						matchSequence.Entropy = entropy.SequenceEntropy(matchSequence, len(seq), (seqDirection == 1))
+						matches = append(matches, matchSequence)
 					}
 					break
 				} else {

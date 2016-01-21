@@ -40,14 +40,17 @@ func TestRepeatMatch(t *testing.T) {
 	assert.Len(t, matches, 2, "Lenght should be 2")
 
 	for _, match := range matches {
-		if strings.ToLower(match.RepeatedChar) == "b" {
+		if strings.ToLower(match.DictionaryName) == "b" {
 			assert.Equal(t, 3, match.I)
 			assert.Equal(t, 6, match.J)
 			assert.Equal(t, "bBbB", match.Token)
+			assert.NotZero(t, match.Entropy, "Entropy should be set")
 		} else {
 			assert.Equal(t, 0, match.I)
 			assert.Equal(t, 2, match.J)
 			assert.Equal(t, "aaa", match.Token)
+			assert.NotZero(t, match.Entropy, "Entropy should be set")
+
 		}
 	}
 }
@@ -63,14 +66,17 @@ func TestSequenceMatch(t *testing.T) {
 			assert.Equal(t, 0, match.I)
 			assert.Equal(t, 3, match.J)
 			assert.Equal(t, "abcd", match.Token)
+			assert.NotZero(t, match.Entropy, "Entropy should be set")
 		} else if match.DictionaryName == "upper" {
 			assert.Equal(t, 10, match.I)
 			assert.Equal(t, 14, match.J)
 			assert.Equal(t, "LMNOP", match.Token)
+			assert.NotZero(t, match.Entropy, "Entropy should be set")
 		} else if match.DictionaryName == "digits" {
 			assert.Equal(t, 21, match.I)
 			assert.Equal(t, 24, match.J)
 			assert.Equal(t, "1234", match.Token)
+			assert.NotZero(t, match.Entropy, "Entropy should be set")
 		} else {
 			assert.True(t, false, "Unknow dictionary")
 		}
@@ -80,15 +86,18 @@ func TestSequenceMatch(t *testing.T) {
 func TestSpatialMatchQwerty(t *testing.T) {
 	matches := SpatialMatch("qwerty")
 	assert.Len(t, matches, 1, "Lenght should be 1")
+	assert.NotZero(t, matches[0].Entropy, "Entropy should be set")
 
 	matches = SpatialMatch("asdf")
 	assert.Len(t, matches, 1, "Lenght should be 1")
+	assert.NotZero(t, matches[0].Entropy, "Entropy should be set")
 
 }
 
 func TestSpatialMatchDvorak(t *testing.T) {
 	matches := SpatialMatch("aoeuidhtns")
 	assert.Len(t, matches, 1, "Lenght should be 1")
+	assert.NotZero(t, matches[0].Entropy, "Entropy should be set")
 
 }
 
@@ -100,6 +109,10 @@ func TestDictionaryMatch(t *testing.T) {
 	}
 
 	assert.Len(t, matches, 4, "Lenght should be 4")
+	for _, match := range matches {
+		assert.NotZero(t, match.Entropy, "Entropy should be set")
+
+	}
 
 }
 

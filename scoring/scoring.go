@@ -2,14 +2,11 @@ package scoring
 
 import (
 	"fmt"
-	"github.com/nbutton23/zxcvbn-go/adjacency"
+	"github.com/nbutton23/zxcvbn-go/entropy"
 	"github.com/nbutton23/zxcvbn-go/match"
-	"github.com/nbutton23/zxcvbn-go/matching"
 	"github.com/nbutton23/zxcvbn-go/utils/math"
 	"math"
-	"regexp"
 	"sort"
-	"unicode"
 )
 
 const (
@@ -43,7 +40,7 @@ Returns minimum entropy
     minimum entropy. O(nm) dp alg for length-n password with m candidate matches.
 */
 func MinimumEntropyMatchSequence(password string, matches []match.Match) MinEntropyMatch {
-	bruteforceCardinality := float64(calcBruteforceCardinality(password))
+	bruteforceCardinality := float64(entropy.CalcBruteForceCardinality(password))
 	upToK := make([]float64, len(password))
 	backPointers := make([]match.Match, len(password))
 
@@ -58,7 +55,7 @@ func MinimumEntropyMatchSequence(password string, matches []match.Match) MinEntr
 			i, j := match.I, match.J
 			//			see if best entropy up to i-1 + entropy of match is less that current min at j
 			upTo := get(upToK, i-1)
-			calculatedEntropy := calcEntropy(match)
+			calculatedEntropy := match.Entropy
 			match.Entropy = calculatedEntropy
 			candidateEntropy := upTo + calculatedEntropy
 
@@ -87,7 +84,7 @@ func MinimumEntropyMatchSequence(password string, matches []match.Match) MinEntr
 	}
 	sort.Sort(match.Matches(matchSequence))
 
-	makeBruteForecMatch := func(i, j int) match.Match {
+	makeBruteForceMatch := func(i, j int) match.Match {
 		return match.Match{Pattern: "bruteforce",
 			I:       i,
 			J:       j,
@@ -101,14 +98,14 @@ func MinimumEntropyMatchSequence(password string, matches []match.Match) MinEntr
 	for _, match := range matchSequence {
 		i, j := match.I, match.J
 		if i-k > 0 {
-			matchSequenceCopy = append(matchSequenceCopy, makeBruteForecMatch(k, i-1))
+			matchSequenceCopy = append(matchSequenceCopy, makeBruteForceMatch(k, i-1))
 		}
 		k = j + 1
 		matchSequenceCopy = append(matchSequenceCopy, match)
 	}
 
 	if k < len(password) {
-		matchSequenceCopy = append(matchSequenceCopy, makeBruteForecMatch(k, len(password)-1))
+		matchSequenceCopy = append(matchSequenceCopy, makeBruteForceMatch(k, len(password)-1))
 	}
 	var minEntropy float64
 	if len(password) == 0 {
@@ -132,170 +129,6 @@ func get(a []float64, i int) float64 {
 	}
 
 	return a[i]
-}
-func calcBruteforceCardinality(password string) float64 {
-	lower, upper, digits, symbols := float64(0), float64(0), float64(0), float64(0)
-
-	for _, char := range password {
-		if unicode.IsLower(char) {
-			lower = float64(26)
-		} else if unicode.IsDigit(char) {
-			digits = float64(10)
-		} else if unicode.IsUpper(char) {
-			upper = float64(26)
-		} else {
-			symbols = float64(33)
-		}
-	}
-
-	cardinality := lower + upper + digits + symbols
-	return cardinality
-}
-
-func calcEntropy(match match.Match) float64 {
-	if match.Entropy > float64(0) {
-		return match.Entropy
-	}
-
-	var entropy float64
-	if match.Pattern == "dictionary" {
-		entropy = dictionaryEntropy(match)
-	} else if match.Pattern == "spatial" {
-		entropy = spatialEntropy(match)
-	} else if match.Pattern == "repeat" {
-		entropy = repeatEntropy(match)
-	} else if match.Pattern == "sequence" {
-		entropy = sequenceEntropy(match)
-	}
-
-	match.Entropy = entropy
-	//TODO finish implement this. . . this looks to be the meat and potatoes of the calculation
-	return match.Entropy
-}
-
-func dictionaryEntropy(match match.Match) float64 {
-	baseEntropy := math.Log2(match.Rank)
-	upperCaseEntropy := extraUpperCaseEntropy(match)
-	//TODO: L33t
-	return baseEntropy + upperCaseEntropy
-}
-
-func spatialEntropy(match match.Match) float64 {
-	var s, d float64
-	if match.DictionaryName == "qwerty" || match.DictionaryName == "dvorak" {
-		s = float64(len(adjacency.BuildQwerty().Graph))
-		d = adjacency.BuildKeypad().CalculateAvgDegree()
-	} else {
-		s = float64(matching.KEYPAD_STARTING_POSITIONS)
-		d = matching.KEYPAD_AVG_DEGREE
-	}
-
-	possibilities := float64(0)
-
-	length := float64(len(match.Token))
-	t := match.Turns
-
-	//TODO: Should this be <= or just < ?
-	//Estimate the number of possible patterns w/ length L or less with t turns or less
-	for i := float64(2); i <= length+1; i++ {
-		possibleTurns := math.Min(float64(t), i-1)
-		for j := float64(1); j <= possibleTurns+1; j++ {
-			x := zxcvbn_math.NChoseK(i-1, j-1) * s * math.Pow(d, j)
-			possibilities += x
-		}
-	}
-
-	entropy := math.Log2(possibilities)
-	//add extra entropu for shifted keys. ( % instead of 5 A instead of a)
-	//Math is similar to extra entropy for uppercase letters in dictionary matches.
-
-	if S := float64(match.ShiftedCount); S > float64(0) {
-		possibilities = float64(0)
-		U := length - S
-
-		for i := float64(0); i < math.Min(S, U)+1; i++ {
-			possibilities += zxcvbn_math.NChoseK(S+U, i)
-		}
-
-		entropy += math.Log2(possibilities)
-	}
-
-	return entropy
-}
-func sequenceEntropy(match match.Match) float64 {
-	firstChar := match.Token[0]
-	baseEntropy := float64(0)
-	if string(firstChar) == "a" || string(firstChar) == "1" {
-		baseEntropy = float64(0)
-	} else {
-		baseEntropy = math.Log2(float64(match.DictionaryLength))
-		if unicode.IsUpper(rune(firstChar)) {
-			baseEntropy++
-		}
-	}
-
-	if !match.Ascending {
-		baseEntropy++
-	}
-	return baseEntropy + math.Log2(float64(len(match.Token)))
-}
-func extraUpperCaseEntropy(match match.Match) float64 {
-	word := match.Token
-
-	allLower := true
-
-	for _, char := range word {
-		if unicode.IsUpper(char) {
-			allLower = false
-			break
-		}
-	}
-	if allLower {
-		return float64(0)
-	}
-
-	//a capitalized word is the most common capitalization scheme,
-	//so it only doubles the search space (uncapitalized + capitalized): 1 extra bit of entropy.
-	//allcaps and end-capitalized are common enough too, underestimate as 1 extra bit to be safe.
-
-	for _, regex := range []string{START_UPPER, END_UPPER, ALL_UPPER} {
-		matcher := regexp.MustCompile(regex)
-
-		if matcher.MatchString(word) {
-			return float64(1)
-		}
-	}
-	//Otherwise calculate the number of ways to capitalize U+L uppercase+lowercase letters with U uppercase letters or
-	//less. Or, if there's more uppercase than lower (for e.g. PASSwORD), the number of ways to lowercase U+L letters
-	//with L lowercase letters or less.
-
-	countUpper, countLower := float64(0), float64(0)
-	for _, char := range word {
-		if unicode.IsUpper(char) {
-			countUpper++
-		} else if unicode.IsLower(char) {
-			countLower++
-		}
-	}
-	totalLenght := countLower + countUpper
-	var possibililities float64
-
-	for i := float64(0); i <= math.Min(countUpper, countLower); i++ {
-		possibililities += float64(zxcvbn_math.NChoseK(totalLenght, i))
-	}
-
-	if possibililities < 1 {
-		return float64(1)
-	}
-
-	return float64(math.Log2(possibililities))
-}
-
-func repeatEntropy(match match.Match) float64 {
-	cardinality := calcBruteforceCardinality(match.Token)
-	entropy := math.Log2(cardinality * float64(len(match.Token)))
-
-	return entropy
 }
 
 func entropyToCrackTime(entropy float64) float64 {
