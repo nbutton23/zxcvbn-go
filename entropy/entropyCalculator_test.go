@@ -6,10 +6,6 @@ import (
 	"testing"
 )
 
-/**
-These test are more for make sure things don't change than check that the calculation is correct.
-I need to hand calc a few of these for that
-*/
 
 func TestDictionaryEntropyCalculation(t *testing.T) {
 	match := match.Match{
@@ -20,7 +16,6 @@ func TestDictionaryEntropyCalculation(t *testing.T) {
 	}
 
 	entropy := DictionaryEntropy(match, float64(20))
-	//20  4.321928094887363
 
 	assert.Equal(t, 4.321928094887363, entropy)
 }
@@ -31,33 +26,30 @@ func TestSpatialEntropyCalculation(t *testing.T) {
 		I:       0,
 		J:       5,
 		Token:   "asdfgh",
+		DictionaryName:"qwerty",
 	}
-
 	entropy := SpatialEntropy(matchPlain, 0, 0)
-
-	assert.Equal(t, 5.832890014164741, entropy)
+	assert.Equal(t, 9.754887502163468, entropy)
 
 	matchShift := match.Match{
 		Pattern: "spatial",
 		I:       0,
 		J:       5,
 		Token:   "asdFgh",
+		DictionaryName:"qwerty",
 	}
-
 	entropyShift := SpatialEntropy(matchShift, 0, 1)
-
-	assert.Equal(t, 8.640244936222345, entropyShift)
+	assert.Equal(t, 12.562242424221072, entropyShift)
 
 	matchTurn := match.Match{
 		Pattern: "spatial",
 		I:       0,
 		J:       5,
 		Token:   "asdcxz",
+		DictionaryName:"qwerty",
 	}
-
 	entropyTurn := SpatialEntropy(matchTurn, 2, 0)
-
-	assert.Equal(t, 8.307061631635431, entropyTurn)
+	assert.Equal(t, 14.080500893768884, entropyTurn)
 }
 
 func TestRepeatMatchEntropyCalculation(t *testing.T) {
@@ -67,10 +59,7 @@ func TestRepeatMatchEntropyCalculation(t *testing.T) {
 		J:       4,
 		Token:   "aaaaa",
 	}
-
 	entropy := RepeatEntropy(matchRepeat)
-	//20  4.321928094887363
-
 	assert.Equal(t, 7.022367813028454, entropy)
 }
 
@@ -81,9 +70,7 @@ func TestSequenceCalculation(t *testing.T) {
 		J:       4,
 		Token:   "jklmn",
 	}
-
 	entropy := SequenceEntropy(matchLower, len("abcdefghijklmnopqrstuvwxyz"), true)
-
 	assert.Equal(t, 7.022367813028454, entropy)
 
 	matchUpper := match.Match{
@@ -92,9 +79,7 @@ func TestSequenceCalculation(t *testing.T) {
 		J:       4,
 		Token:   "JKLMN",
 	}
-
 	entropy = SequenceEntropy(matchUpper, len("abcdefghijklmnopqrstuvwxyz"), true)
-
 	assert.Equal(t, 8.022367813028454, entropy)
 
 	matchUpperDec := match.Match{
@@ -103,9 +88,7 @@ func TestSequenceCalculation(t *testing.T) {
 		J:       4,
 		Token:   "JKLMN",
 	}
-
 	entropy = SequenceEntropy(matchUpperDec, len("abcdefghijklmnopqrstuvwxyz"), false)
-
 	assert.Equal(t, 9.022367813028454, entropy)
 
 	matchDigit := match.Match{
@@ -114,8 +97,6 @@ func TestSequenceCalculation(t *testing.T) {
 		J:       4,
 		Token:   "34567",
 	}
-
 	entropy = SequenceEntropy(matchDigit, 10, true)
-
 	assert.Equal(t, 5.643856189774724, entropy)
 }

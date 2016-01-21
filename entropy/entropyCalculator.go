@@ -82,11 +82,12 @@ func extraUpperCaseEntropy(match match.Match) float64 {
 func SpatialEntropy(match match.Match, turns int, shiftCount int) float64 {
 	var s, d float64
 	if match.DictionaryName == "qwerty" || match.DictionaryName == "dvorak" {
+		//todo: verify qwerty and dvorak have the same length and degree
 		s = float64(len(adjacency.BuildQwerty().Graph))
-		d = adjacency.BuildKeypad().CalculateAvgDegree() // Should that be avg degree of the graph?
+		d = adjacency.BuildQwerty().CalculateAvgDegree()
 	} else {
-		s = float64(KEYPAD_STARTING_POSITIONS) // Can this be declared and calc here?
-		d = KEYPAD_AVG_DEGREE                  // can this be delcared and calc here?
+		s = float64(KEYPAD_STARTING_POSITIONS)
+		d = KEYPAD_AVG_DEGREE
 	}
 
 	possibilities := float64(0)
@@ -128,6 +129,7 @@ func RepeatEntropy(match match.Match) float64 {
 	return entropy
 }
 
+//TODO: Validate against python
 func CalcBruteForceCardinality(password string) float64 {
 	lower, upper, digits, symbols := float64(0), float64(0), float64(0), float64(0)
 
@@ -154,6 +156,7 @@ func SequenceEntropy(match match.Match, dictionaryLength int, ascending bool) fl
 		baseEntropy = float64(0)
 	} else {
 		baseEntropy = math.Log2(float64(dictionaryLength))
+		//TODO: should this be just the first or any char
 		if unicode.IsUpper(rune(firstChar)) {
 			baseEntropy++
 		}
