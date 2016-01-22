@@ -19,18 +19,11 @@ func (s Matches) Less(i, j int) bool {
 }
 
 type Match struct {
-	Pattern          string
-	I, J             int
-	Token            string
-	MatchedWord      string
-	Rank             float64
-	DictionaryName   string
-	DictionaryLength int
-	Ascending        bool
-	Turns            int
-	ShiftedCount     int
-	Entropy          float64
-	RepeatedChar     string
+	Pattern        string
+	I, J           int
+	Token          string
+	DictionaryName string
+	Entropy        float64
 }
 
 type DateMatch struct {

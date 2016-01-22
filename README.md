@@ -56,7 +56,7 @@ Bug reports and pull requests welcome!
 Project Status
 ------------------------------------------------------------------------
 
-This is a work in progress. I would welcome some review of the code. I am new to goLang and expect that I have made some mistakes; if not in logic in performance.
+Use zxcvbn_test.go to check how close to feature parity the project is. 
 
 ------------------------------------------------------------------------
 Acknowledgment
