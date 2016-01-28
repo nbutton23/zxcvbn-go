@@ -21,6 +21,7 @@ func init() {
 	AdjacencyGph["dvorak"] = BuildDvorak()
 	AdjacencyGph["keypad"] = BuildKeypad()
 	AdjacencyGph["macKeypad"] = BuildMacKeypad()
+	AdjacencyGph["l33t"] = BuildLeet()
 }
 
 func BuildQwerty() AdjacencyGraph {
@@ -50,6 +51,13 @@ func BuildMacKeypad() AdjacencyGraph {
 		panic("Can't find asset")
 	}
 	return GetAdjancencyGraphFromFile(data, "mac_keypad")
+}
+func BuildLeet() AdjacencyGraph {
+	data, err := zxcvbn_data.Asset("data/L33t.json")
+	if err != nil {
+		panic("Can't find asset")
+	}
+	return GetAdjancencyGraphFromFile(data, "keypad")
 }
 
 func GetAdjancencyGraphFromFile(data []byte, name string) AdjacencyGraph {

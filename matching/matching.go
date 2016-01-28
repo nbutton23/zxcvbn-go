@@ -8,7 +8,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
-	//	"github.com/deckarep/golang-set"
+//	"github.com/deckarep/golang-set"
 	"github.com/nbutton23/zxcvbn-go/entropy"
 )
 
@@ -65,6 +65,7 @@ func loadFrequencyList() {
 	KEYBOARD_STARTING_POSITIONS = len(adjacency.AdjacencyGph["querty"].Graph)
 	KEYPAD_AVG_DEGREE = adjacency.AdjacencyGph["keypad"].CalculateAvgDegree()
 	KEYPAD_STARTING_POSITIONS = len(adjacency.AdjacencyGph["keypad"].Graph)
+	L33T_TABLE = adjacency.AdjacencyGph["l33t"]
 
 	ADJACENCY_GRAPHS = append(ADJACENCY_GRAPHS, adjacency.AdjacencyGph["qwerty"])
 	ADJACENCY_GRAPHS = append(ADJACENCY_GRAPHS, adjacency.AdjacencyGph["dvorak"])
@@ -319,34 +320,83 @@ func spatialMatchHelper(password string, graph adjacency.AdjacencyGraph) (matche
 	return matches
 }
 
-func relevantL33tSubtable(password string) adjacency.AdjacencyGraph {
-	var releventSubs adjacency.AdjacencyGraph
-	for _, char := range password {
-		if len(L33T_TABLE.Graph[string(char)]) > 0 {
-			releventSubs.Graph[string(char)] = L33T_TABLE.Graph[string(char)]
-		}
-	}
 
-	return releventSubs
+func l33tMatch(password string) []match.Match {
+
+
+
+	return nil
 }
 
-//TODO yeah this is a little harder than i expect. . .
-//func enumerateL33tSubs(table adjacency.AdjacencyGraph) []string {
+//TODO: what is the return value of this?
+//func enumerateL33tSubs(table map[string]string) []string {
+//
+//	//subs = [[]]
 //	var subs [][]string
+//    /*
+//    def dedup(subs):
+//        deduped = []
+//        members = set()
+//        for sub in subs:
+//            key = str(sorted(sub))
+//            if key not in members:
+//                deduped.append(sub)
+//        return deduped
+//        */
+//	dedup := func(subsSlice []string){
+//		var deduped []string
 //
-//	dedup := func(subs []string) []string {
-//		 deduped := mapset.NewSetFromSlice(subs)
-//		return deduped.ToSlice()
-//	}
-//
-//	for i,v := range table.Graph {
-//		var nextSubs []string
-//		for _, subChar := range v {
+//		for _, sub := range subsSlice {
 //
 //		}
-//
 //	}
+//	/*
+//    keys = table.keys()
+//    while len(keys) > 0:
+//        first_key = keys[0]
+//        rest_keys = keys[1:]
+//        next_subs = []
+//        for l33t_chr in table[first_key]:
+//            for sub in subs:
+//                dup_l33t_index = -1
+//                for i in range(0, len(sub)):
+//                    if sub[i][0] == l33t_chr:
+//                        dup_l33t_index = i
+//                        break
+//                if dup_l33t_index == -1:
+//                    sub_extension = list(sub)
+//                    sub_extension.append((l33t_chr, first_key))
+//                    next_subs.append(sub_extension)
+//                else:
+//                    sub_alternative = list(sub)
+//                    sub_alternative.pop(dup_l33t_index)
+//                    sub_alternative.append((l33t_chr, first_key))
+//                    next_subs.append(sub)
+//                    next_subs.append(sub_alternative)
+//        subs = dedup(next_subs)
+//        keys = rest_keys
+//    return map(dict, subs)
+//
+//	 */
+//
+//
+//
+//
+//	//TODO: Remove
+//	return nil
 //}
+
+func relevantL33tSubtable(password string) map[string]string {
+	relevantSubs := make(map[string]string)
+	for key, values := range L33T_TABLE.Graph {
+		for _, value := range values {
+			if strings.Contains(password, value) {
+				relevantSubs[value] = key
+			}
+		}
+	}
+	return relevantSubs
+}
 
 func RepeatMatch(password string) []match.Match {
 	var matches []match.Match

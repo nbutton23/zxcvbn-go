@@ -120,3 +120,12 @@ func TestDateWithoutSepMatch(t *testing.T) {
 	matches := dateWithoutSepMatch("11091991")
 	assert.Len(t, matches, 1, "Lenght should be 1")
 }
+
+//l33t
+func TestLeetSubTable(t *testing.T){
+	subs := relevantL33tSubtable("password")
+	assert.Len(t, subs, 0, "password should produce no leet subs")
+
+	subs = relevantL33tSubtable("p4ssw0rd")
+	assert.Len(t, subs, 2, "p4ssw0rd should produce 2 subs")
+}
