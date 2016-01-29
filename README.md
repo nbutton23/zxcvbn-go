@@ -56,7 +56,7 @@ Bug reports and pull requests welcome!
 Project Status
 ------------------------------------------------------------------------
 
-Use zxcvbn_test.go to check how close to feature parity the project is. 
+Use zxcvbn_test.go to check how close to feature parity the project is.
 
 ------------------------------------------------------------------------
 Acknowledgment

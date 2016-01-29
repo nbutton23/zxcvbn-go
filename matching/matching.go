@@ -8,7 +8,6 @@ import (
 	"sort"
 	"strconv"
 	"strings"
-	//	"github.com/deckarep/golang-set"
 	"github.com/nbutton23/zxcvbn-go/entropy"
 )
 
@@ -65,6 +64,7 @@ func loadFrequencyList() {
 	KEYBOARD_STARTING_POSITIONS = len(adjacency.AdjacencyGph["querty"].Graph)
 	KEYPAD_AVG_DEGREE = adjacency.AdjacencyGph["keypad"].CalculateAvgDegree()
 	KEYPAD_STARTING_POSITIONS = len(adjacency.AdjacencyGph["keypad"].Graph)
+	L33T_TABLE = adjacency.AdjacencyGph["l33t"]
 
 	ADJACENCY_GRAPHS = append(ADJACENCY_GRAPHS, adjacency.AdjacencyGph["qwerty"])
 	ADJACENCY_GRAPHS = append(ADJACENCY_GRAPHS, adjacency.AdjacencyGph["dvorak"])
@@ -83,6 +83,7 @@ func loadFrequencyList() {
 	MATCHERS = append(MATCHERS, SpatialMatch)
 	MATCHERS = append(MATCHERS, RepeatMatch)
 	MATCHERS = append(MATCHERS, SequenceMatch)
+	MATCHERS = append(MATCHERS, l33tMatch)
 
 }
 
@@ -319,34 +320,67 @@ func spatialMatchHelper(password string, graph adjacency.AdjacencyGraph) (matche
 	return matches
 }
 
-func relevantL33tSubtable(password string) adjacency.AdjacencyGraph {
-	var releventSubs adjacency.AdjacencyGraph
-	for _, char := range password {
-		if len(L33T_TABLE.Graph[string(char)]) > 0 {
-			releventSubs.Graph[string(char)] = L33T_TABLE.Graph[string(char)]
+
+func l33tMatch(password string) []match.Match {
+
+	subsitutions := relevantL33tSubtable(password)
+
+	permutations := getAllPermutationsOfLeetSubstitutions(password, subsitutions)
+
+	var matches []match.Match
+
+	for _, permutation := range permutations {
+		for _, mather := range DICTIONARY_MATCHERS {
+			matches = append(matches,mather(permutation)...)
 		}
 	}
 
-	return releventSubs
+	for _, match := range matches {
+		match.Entropy += entropy.ExtraLeetEntropy(match, password)
+		match.DictionaryName = match.DictionaryName + "_3117"
+	}
+
+	return matches
 }
 
-//TODO yeah this is a little harder than i expect. . .
-//func enumerateL33tSubs(table adjacency.AdjacencyGraph) []string {
-//	var subs [][]string
-//
-//	dedup := func(subs []string) []string {
-//		 deduped := mapset.NewSetFromSlice(subs)
-//		return deduped.ToSlice()
-//	}
-//
-//	for i,v := range table.Graph {
-//		var nextSubs []string
-//		for _, subChar := range v {
-//
-//		}
-//
-//	}
-//}
+func getAllPermutationsOfLeetSubstitutions(password string, substitutionsMap map[string][]string) []string {
+
+	var permutations []string
+
+	for index, char := range password {
+			for value, splice := range substitutionsMap {
+				for _, sub := range splice {
+					if string(char) == sub {
+						var permutation string
+						permutation = password[:index]+value+password[index+1:]
+
+						permutations = append(permutations, permutation)
+						if index < len(permutation) {
+							tempPermutations := getAllPermutationsOfLeetSubstitutions(permutation[index + 1:], substitutionsMap)
+							for _, temp := range tempPermutations {
+								permutations = append(permutations, permutation[:index + 1] + temp)
+							}
+
+						}
+					}
+				}
+			}
+	}
+
+	return permutations
+}
+
+func relevantL33tSubtable(password string) map[string][]string {
+	relevantSubs := make(map[string][]string)
+	for key, values := range L33T_TABLE.Graph {
+		for _, value := range values {
+			if strings.Contains(password, value) {
+				relevantSubs[key] = append(relevantSubs[key], value)
+			}
+		}
+	}
+	return relevantSubs
+}
 
 func RepeatMatch(password string) []match.Match {
 	var matches []match.Match
