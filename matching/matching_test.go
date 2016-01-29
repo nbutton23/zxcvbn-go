@@ -5,6 +5,7 @@ import (
 	"github.com/nbutton23/zxcvbn-go/match"
 	"strings"
 	"testing"
+	"fmt"
 )
 
 //DateSepMatch("1991-09-11jibjab11.9.1991")
@@ -167,4 +168,11 @@ func TestPermutationsOfLeetSubstitutions(t *testing.T){
 	possibleSubs = relevantL33tSubtable(password)
 	permutations = getAllPermutationsOfLeetSubstitutions(password, possibleSubs)
 	assert.Len(t, permutations, 35, "check my math 3*2*2*3 -1 ")
+}
+
+func TestLeet(t *testing.T){
+	password := "p4ssw0rd"
+	matches := l33tMatch(password)
+
+	fmt.Println(matches[0].J)
 }

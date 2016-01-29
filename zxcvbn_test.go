@@ -13,7 +13,7 @@ Use these test to see how close to feature parity the library is.
 */
 
 const (
-	allowableError = float64(0.01)
+	allowableError = float64(0.05)
 )
 
 type failedTest struct {

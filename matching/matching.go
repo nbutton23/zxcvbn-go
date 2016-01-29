@@ -83,6 +83,7 @@ func loadFrequencyList() {
 	MATCHERS = append(MATCHERS, SpatialMatch)
 	MATCHERS = append(MATCHERS, RepeatMatch)
 	MATCHERS = append(MATCHERS, SequenceMatch)
+	MATCHERS = append(MATCHERS, l33tMatch)
 
 }
 
@@ -322,9 +323,25 @@ func spatialMatchHelper(password string, graph adjacency.AdjacencyGraph) (matche
 
 func l33tMatch(password string) []match.Match {
 
+	subsitutions := relevantL33tSubtable(password)
 
+	permutations := getAllPermutationsOfLeetSubstitutions(password, subsitutions)
 
-	return nil
+	var matches []match.Match
+
+	for _, permutation := range permutations {
+		for _, mather := range DICTIONARY_MATCHERS {
+			matches = append(matches,mather(permutation)...)
+		}
+	}
+
+	for _, match := range matches {
+		println(match.Entropy)
+		match.Entropy += entropy.ExtraLeetEntropy(match, password)
+		println(match.Entropy)
+	}
+
+	return matches
 }
 
 func getAllPermutationsOfLeetSubstitutions(password string, substitutionsMap map[string][]string) []string {
@@ -353,63 +370,6 @@ func getAllPermutationsOfLeetSubstitutions(password string, substitutionsMap map
 
 	return permutations
 }
-//TODO: what is the return value of this?
-//func enumerateL33tSubs(table map[string]string) []string {
-//
-//	//subs = [[]]
-//	var subs [][]string
-//    /*
-//    def dedup(subs):
-//        deduped = []
-//        members = set()
-//        for sub in subs:
-//            key = str(sorted(sub))
-//            if key not in members:
-//                deduped.append(sub)
-//        return deduped
-//        */
-//	dedup := func(subsSlice []string){
-//		var deduped []string
-//
-//		for _, sub := range subsSlice {
-//
-//		}
-//	}
-//	/*
-//    keys = table.keys()
-//    while len(keys) > 0:
-//        first_key = keys[0]
-//        rest_keys = keys[1:]
-//        next_subs = []
-//        for l33t_chr in table[first_key]:
-//            for sub in subs:
-//                dup_l33t_index = -1
-//                for i in range(0, len(sub)):
-//                    if sub[i][0] == l33t_chr:
-//                        dup_l33t_index = i
-//                        break
-//                if dup_l33t_index == -1:
-//                    sub_extension = list(sub)
-//                    sub_extension.append((l33t_chr, first_key))
-//                    next_subs.append(sub_extension)
-//                else:
-//                    sub_alternative = list(sub)
-//                    sub_alternative.pop(dup_l33t_index)
-//                    sub_alternative.append((l33t_chr, first_key))
-//                    next_subs.append(sub)
-//                    next_subs.append(sub_alternative)
-//        subs = dedup(next_subs)
-//        keys = rest_keys
-//    return map(dict, subs)
-//
-//	 */
-//
-//
-//
-//
-//	//TODO: Remove
-//	return nil
-//}
 
 func relevantL33tSubtable(password string) map[string][]string {
 	relevantSubs := make(map[string][]string)

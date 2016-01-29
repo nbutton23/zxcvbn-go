@@ -156,7 +156,7 @@ func SequenceEntropy(match match.Match, dictionaryLength int, ascending bool) fl
 		baseEntropy = float64(0)
 	} else {
 		baseEntropy = math.Log2(float64(dictionaryLength))
-		//TODO: should this be just the first or any char
+		//TODO: should this be just the first or any char?
 		if unicode.IsUpper(rune(firstChar)) {
 			baseEntropy++
 		}
@@ -166,4 +166,29 @@ func SequenceEntropy(match match.Match, dictionaryLength int, ascending bool) fl
 		baseEntropy++
 	}
 	return baseEntropy + math.Log2(float64(len(match.Token)))
+}
+
+func ExtraLeetEntropy(match match.Match, password string) float64 {
+	var subsitutions float64
+	var unsub float64
+	subPassword := password[match.I:match.J]
+	for index, char := range subPassword {
+		if string(char) != string(match.Token[index]) {
+			subsitutions++
+		} else {
+			//TODO: Make this only true for 1337 chars that are not subs?
+			unsub++
+		}
+	}
+
+	var possibilities float64
+
+	for i := float64(0); i <= math.Min(subsitutions, unsub)+1; i++ {
+		possibilities += zxcvbn_math.NChoseK(subsitutions+unsub, i)
+	}
+
+	if possibilities <= 1 {
+		return float64(1)
+	}
+	return math.Log2(possibilities)
 }
