@@ -8,7 +8,6 @@ import (
 	"sort"
 	"strconv"
 	"strings"
-//	"github.com/deckarep/golang-set"
 	"github.com/nbutton23/zxcvbn-go/entropy"
 )
 
@@ -328,6 +327,32 @@ func l33tMatch(password string) []match.Match {
 	return nil
 }
 
+func getAllPermutationsOfLeetSubstitutions(password string, substitutionsMap map[string][]string) []string {
+
+	var permutations []string
+
+	for index, char := range password {
+			for value, splice := range substitutionsMap {
+				for _, sub := range splice {
+					if string(char) == sub {
+						var permutation string
+						permutation = password[:index]+value+password[index+1:]
+
+						permutations = append(permutations, permutation)
+						if index < len(permutation) {
+							tempPermutations := getAllPermutationsOfLeetSubstitutions(permutation[index + 1:], substitutionsMap)
+							for _, temp := range tempPermutations {
+								permutations = append(permutations, permutation[:index + 1] + temp)
+							}
+
+						}
+					}
+				}
+			}
+	}
+
+	return permutations
+}
 //TODO: what is the return value of this?
 //func enumerateL33tSubs(table map[string]string) []string {
 //
@@ -386,12 +411,12 @@ func l33tMatch(password string) []match.Match {
 //	return nil
 //}
 
-func relevantL33tSubtable(password string) map[string]string {
-	relevantSubs := make(map[string]string)
+func relevantL33tSubtable(password string) map[string][]string {
+	relevantSubs := make(map[string][]string)
 	for key, values := range L33T_TABLE.Graph {
 		for _, value := range values {
 			if strings.Contains(password, value) {
-				relevantSubs[value] = key
+				relevantSubs[key] = append(relevantSubs[key], value)
 			}
 		}
 	}

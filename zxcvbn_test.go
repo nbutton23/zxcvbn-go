@@ -3,26 +3,24 @@ package zxcvbn
 import (
 	"testing"
 
+	"fmt"
 	"math"
 	"strconv"
-	"fmt"
 )
 
 /**
 Use these test to see how close to feature parity the library is.
- */
-
+*/
 
 const (
- allowableError = float64(0.01)
+	allowableError = float64(0.01)
 )
 
-type failedTest struct  {
+type failedTest struct {
 	Password string
 	Expect   float64
 	Actual   float64
-	PError float64
-
+	PError   float64
 }
 
 var failedTests []failedTest
@@ -32,11 +30,11 @@ func TestPasswordStrength(t *testing.T) {
 
 	//Expected calculated by running zxcvbn-python
 	runTest(t, "zxcvbn", float64(6.845490050944376))
-	runTest(t, "Tr0ub4dour&3",float64(17.296) )
-	runTest(t,"qwER43@!", float64(26.44) )
-	runTest(t,"correcthorsebatterystaple", float64(45.212) )
-	runTest(t,"coRrecth0rseba++ery9.23.2007staple$", float64(66.018) )
-	runTest(t,"D0g..................", float64(20.678) )
+	runTest(t, "Tr0ub4dour&3", float64(17.296))
+	runTest(t, "qwER43@!", float64(26.44))
+	runTest(t, "correcthorsebatterystaple", float64(45.212))
+	runTest(t, "coRrecth0rseba++ery9.23.2007staple$", float64(66.018))
+	runTest(t, "D0g..................", float64(20.678))
 	runTest(t, "abcdefghijk987654321", float64(11.951))
 	runTest(t, "neverforget13/3/1997", float64(32.628))
 	runTest(t, "1qaz2wsx3edc", float64(19.314))
@@ -71,20 +69,20 @@ func TestPasswordStrength(t *testing.T) {
 		fmt.Printf(formatString, test.Password, allowableError, test.PError, test.Expect, test.Actual)
 	}
 
-	pTestPassed := (float64(numTestRan - len(failedTests))/ float64(numTestRan))* float64(100)
+	pTestPassed := (float64(numTestRan-len(failedTests)) / float64(numTestRan)) * float64(100)
 
-	fmt.Println("\n % of the test passed " + strconv.FormatFloat(pTestPassed, 'f', -1, 64) )
+	fmt.Println("\n % of the test passed " + strconv.FormatFloat(pTestPassed, 'f', -1, 64))
 
 }
 
 func runTest(t *testing.T, password string, pythonEntropy float64) {
 	//Calculated by running it through python-zxcvbn
 	goEntropy := GoPasswordStrength(password, nil)
-	perror := math.Abs(goEntropy-pythonEntropy)/pythonEntropy
+	perror := math.Abs(goEntropy-pythonEntropy) / pythonEntropy
 
 	numTestRan++
 	if perror > allowableError {
-		failedTests = append(failedTests, failedTest{Password:password, Expect:pythonEntropy, Actual:goEntropy,PError:perror})
+		failedTests = append(failedTests, failedTest{Password: password, Expect: pythonEntropy, Actual: goEntropy, PError: perror})
 	}
 }
 

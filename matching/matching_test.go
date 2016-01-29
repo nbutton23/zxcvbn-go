@@ -128,4 +128,43 @@ func TestLeetSubTable(t *testing.T){
 
 	subs = relevantL33tSubtable("p4ssw0rd")
 	assert.Len(t, subs, 2, "p4ssw0rd should produce 2 subs")
+
+	subs = relevantL33tSubtable("1eet")
+	assert.Len(t, subs, 2, "1eet should produce 2 subs")
+	assert.Equal(t, subs["i"][0], "1")
+	assert.Equal(t, subs["l"][0], "1")
+
+
+	subs = relevantL33tSubtable("4pple@pple")
+	assert.Len(t, subs, 1, "4pple@pple should produce 1 subs")
+	assert.Len(t, subs["a"], 2)
+
+
+}
+
+func TestPermutationsOfLeetSubstitutions(t *testing.T){
+	password := "p4ssw0rd"    //[passw0rd, password, p4ssword]
+	possibleSubs := relevantL33tSubtable(password)
+
+	permutations := getAllPermutationsOfLeetSubstitutions(password, possibleSubs)
+
+	assert.Len(t, permutations, 3, "There should be 3 permutations for "+password)
+
+	password = "p4$sw0rd"    //[pa$sw0rd, passw0rd, password, pa$sword, p4ssw0rd, p4ssword, p4$sword]
+	possibleSubs = relevantL33tSubtable(password)
+
+	permutations = getAllPermutationsOfLeetSubstitutions(password, possibleSubs)
+	assert.Len(t, permutations, 7, "There should be 7 (? check my math) permutations for "+password)
+
+	password = "p4$$w0rd"    //[pa$sw0rd, passw0rd, password, pa$sword, p4ssw0rd, p4ssword, p4$sword]
+	possibleSubs = relevantL33tSubtable(password)
+
+	permutations = getAllPermutationsOfLeetSubstitutions(password, possibleSubs)
+	assert.Len(t, permutations, 15, "Check my math 2*2*2*2 - 1 "+password)
+
+
+	password = "1337"
+	possibleSubs = relevantL33tSubtable(password)
+	permutations = getAllPermutationsOfLeetSubstitutions(password, possibleSubs)
+	assert.Len(t, permutations, 35, "check my math 3*2*2*3 -1 ")
 }
