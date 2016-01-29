@@ -336,9 +336,8 @@ func l33tMatch(password string) []match.Match {
 	}
 
 	for _, match := range matches {
-		println(match.Entropy)
 		match.Entropy += entropy.ExtraLeetEntropy(match, password)
-		println(match.Entropy)
+		match.DictionaryName = match.DictionaryName + "_3117"
 	}
 
 	return matches
