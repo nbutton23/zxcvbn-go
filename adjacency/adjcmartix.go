@@ -16,7 +16,6 @@ type AdjacencyGraph struct {
 var AdjacencyGph = make(map[string]AdjacencyGraph)
 
 func init() {
-	log.SetFlags(log.Lshortfile)
 	AdjacencyGph["qwerty"] = BuildQwerty()
 	AdjacencyGph["dvorak"] = BuildDvorak()
 	AdjacencyGph["keypad"] = BuildKeypad()
