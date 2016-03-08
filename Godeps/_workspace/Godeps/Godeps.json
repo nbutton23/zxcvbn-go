@@ -1,8 +1,0 @@
-{
-	"ImportPath": "github.com/nbutton23/zxcvbn-go/Godeps/_workspace",
-	"GoVersion": "go1.5",
-	"Packages": [
-		"./..."
-	],
-	"Deps": []
-}

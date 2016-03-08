@@ -13,6 +13,9 @@ const (
 	START_UPPER string = `^[A-Z][^A-Z]+$`
 	END_UPPER   string = `^[^A-Z]+[A-Z]$'`
 	ALL_UPPER   string = `^[A-Z]+$`
+	NUM_YEARS = float64(119) // years match against 1900 - 2019
+	NUM_MONTHS = float64(12)
+	NUM_DAYS = float64(31)
 )
 
 var (
@@ -191,4 +194,22 @@ func ExtraLeetEntropy(match match.Match, password string) float64 {
 		return float64(1)
 	}
 	return math.Log2(possibilities)
+}
+
+func YearEntropy(dateMatch match.DateMatch) float64 {
+	return math.Log2(NUM_YEARS)
+}
+
+func DateEntropy(dateMatch match.DateMatch) float64 {
+	var entropy float64
+	if dateMatch.Year < 100 {
+		entropy = math.Log2(NUM_DAYS * NUM_MONTHS * 100)
+	} else {
+		entropy = math.Log2(NUM_DAYS * NUM_MONTHS * NUM_YEARS)
+	}
+
+	if dateMatch.Separator != "" {
+		entropy += 2 //add two bits for separator selection [/,-,.,etc]
+	}
+	return entropy
 }

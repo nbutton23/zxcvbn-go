@@ -53,11 +53,9 @@ func MinimumEntropyMatchSequence(password string, matches []match.Match) MinEntr
 			}
 
 			i, j := match.I, match.J
-			//			see if best entropy up to i-1 + entropy of match is less that current min at j
+			//see if best entropy up to i-1 + entropy of match is less that current min at j
 			upTo := get(upToK, i-1)
-			calculatedEntropy := match.Entropy
-			match.Entropy = calculatedEntropy
-			candidateEntropy := upTo + calculatedEntropy
+			candidateEntropy := upTo + match.Entropy
 
 			if candidateEntropy < upToK[j] {
 				upToK[j] = candidateEntropy
