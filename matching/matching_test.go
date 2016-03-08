@@ -6,13 +6,14 @@ import (
 	"strings"
 	"testing"
 	"fmt"
+	"encoding/json"
 )
 
 //DateSepMatch("1991-09-11jibjab11.9.1991")
 //[{date 16 25  . 9 11 1991} {date 0 10  - 9 11 1991}]
 
 func TestDateSepMatch(t *testing.T) {
-	matches := DateSepMatch("1991-09-11jibjab11.9.1991")
+	matches := dateSepMatchHelper("1991-09-11jibjab11.9.1991")
 
 	assert.Len(t, matches, 2, "Length should be 2")
 
@@ -36,7 +37,7 @@ func TestDateSepMatch(t *testing.T) {
 
 func TestRepeatMatch(t *testing.T) {
 	//aaaBbBb
-	matches := RepeatMatch("aaabBbB")
+	matches := repeatMatch("aaabBbB")
 
 	assert.Len(t, matches, 2, "Lenght should be 2")
 
@@ -59,7 +60,7 @@ func TestRepeatMatch(t *testing.T) {
 func TestSequenceMatch(t *testing.T) {
 	//abcdjibjacLMNOPjibjac1234  => abcd LMNOP 1234
 
-	matches := SequenceMatch("abcdjibjacLMNOPjibjac1234")
+	matches := sequenceMatch("abcdjibjacLMNOPjibjac1234")
 	assert.Len(t, matches, 3, "Lenght should be 2")
 
 	for _, match := range matches {
@@ -85,18 +86,18 @@ func TestSequenceMatch(t *testing.T) {
 }
 
 func TestSpatialMatchQwerty(t *testing.T) {
-	matches := SpatialMatch("qwerty")
+	matches := spatialMatch("qwerty")
 	assert.Len(t, matches, 1, "Lenght should be 1")
 	assert.NotZero(t, matches[0].Entropy, "Entropy should be set")
 
-	matches = SpatialMatch("asdf")
+	matches = spatialMatch("asdf")
 	assert.Len(t, matches, 1, "Lenght should be 1")
 	assert.NotZero(t, matches[0].Entropy, "Entropy should be set")
 
 }
 
 func TestSpatialMatchDvorak(t *testing.T) {
-	matches := SpatialMatch("aoeuidhtns")
+	matches := spatialMatch("aoeuidhtns")
 	assert.Len(t, matches, 1, "Lenght should be 1")
 	assert.NotZero(t, matches[0].Entropy, "Entropy should be set")
 
@@ -171,8 +172,10 @@ func TestPermutationsOfLeetSubstitutions(t *testing.T){
 }
 
 func TestLeet(t *testing.T){
-	password := "p4ssw0rd"
+	password := "1337"
 	matches := l33tMatch(password)
+	bytes, _ := json.Marshal(matches)
+	fmt.Println(string(bytes))
 
 	fmt.Println(matches[0].J)
 }
