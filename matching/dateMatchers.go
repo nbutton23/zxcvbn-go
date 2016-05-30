@@ -19,7 +19,7 @@ func checkDate(day, month, year int64) (bool, int64, int64, int64) {
 		return false, 0, 0, 0
 	}
 
-	if !(1900 <= year && year <= 2019) {
+	if !((1900 <= year && year <= 2019) || (0 <= year && year <= 99)) {
 		return false, 0, 0, 0
 	}
 
@@ -91,8 +91,32 @@ type DateMatchCandidate struct {
 	I, J     int
 }
 
-//TODO I think Im doing this wrong.
-func dateWithoutSepMatch(password string) (matches []match.DateMatch) {
+type DateMatchCandidateTwo struct {
+	Day string
+	Month string
+	Year     string
+	I, J     int
+}
+func dateWithoutSepMatch(password string) ([]match.Match) {
+	dateMatches := dateWithoutSepMatchHelper(password)
+
+	var matches []match.Match
+	for _, dateMatch := range dateMatches {
+		match := match.Match{
+			I:dateMatch.I,
+			J:dateMatch.J,
+			Entropy:entropy.DateEntropy(dateMatch),
+			DictionaryName:"date_match",
+			Token:dateMatch.Token,
+		}
+
+		matches = append(matches, match)
+	}
+
+	return matches
+}
+//TODO Has issues with 6 digit dates
+func dateWithoutSepMatchHelper(password string) (matches []match.DateMatch) {
 	matcher := regexp.MustCompile(DATE_WITHOUT_SEP_MATCH)
 	for _, v := range matcher.FindAllString(password, len(password)) {
 		i := strings.Index(password, v)
@@ -113,14 +137,45 @@ func dateWithoutSepMatch(password string) (matches []match.DateMatch) {
 			candidatesRoundOne = append(candidatesRoundOne, buildDateMatchCandidate(v[4:], v[0:4], i, j))
 
 			//4-digit year sufix
-			candidatesRoundOne = append(candidatesRoundOne, buildDateMatchCandidate(v[0:lastIndex-4], v[lastIndex-4:], i, j))
+			candidatesRoundOne = append(candidatesRoundOne, buildDateMatchCandidate(v[0:lastIndex-3], v[lastIndex-3:], i, j))
 		}
 
-		var candidatesRoundTwo []match.DateMatch
+
+		var candidatesRoundTwo []DateMatchCandidateTwo
 		for _, c := range candidatesRoundOne {
 			if len(c.DayMonth) == 2 {
-				candidatesRoundTwo = append(candidatesRoundTwo, buildDateMatchCandidateTwo(c.DayMonth[0], c.DayMonth[1], c.Year, c.I, c.J))
+				candidatesRoundTwo = append(candidatesRoundTwo, buildDateMatchCandidateTwo(c.DayMonth[0:0], c.DayMonth[1:1], c.Year, c.I, c.J))
+			} else if len(c.DayMonth) == 3 {
+				candidatesRoundTwo = append(candidatesRoundTwo, buildDateMatchCandidateTwo(c.DayMonth[0:2],c.DayMonth[2:2], c.Year, c.I, c.J))
+				candidatesRoundTwo = append(candidatesRoundTwo, buildDateMatchCandidateTwo(c.DayMonth[0:0],c.DayMonth[1:3], c.Year, c.I, c.J))
+			} else if len(c.DayMonth) == 4 {
+				candidatesRoundTwo = append(candidatesRoundTwo, buildDateMatchCandidateTwo(c.DayMonth[0:2],c.DayMonth[2:4], c.Year, c.I, c.J))
 			}
+		}
+
+		for _, candidate := range candidatesRoundTwo {
+			intDay, err := strconv.ParseInt(candidate.Day, 10, 16)
+			if err != nil {
+				continue
+			}
+
+
+			intMonth, err := strconv.ParseInt(candidate.Month, 10, 16)
+
+			if err != nil {
+				continue
+			}
+
+
+			intYear, err := strconv.ParseInt(candidate.Year, 10, 16)
+			if err != nil {
+				continue
+			}
+
+			if ok, _, _, _:= checkDate(intDay, intMonth, intYear); ok{
+				matches = append(matches, match.DateMatch{Token:password, Pattern:"date", Day:intDay, Month:intMonth, Year:intYear, I:i, J:j })
+			}
+
 		}
 	}
 
@@ -131,12 +186,7 @@ func buildDateMatchCandidate(dayMonth, year string, i, j int) DateMatchCandidate
 	return DateMatchCandidate{DayMonth: dayMonth, Year: year, I: i, J: j}
 }
 
-func buildDateMatchCandidateTwo(day, month byte, year string, i, j int) match.DateMatch {
-	sDay := string(day)
-	sMonth := string(month)
-	intDay, _ := strconv.ParseInt(sDay, 10, 16)
-	intMonth, _ := strconv.ParseInt(sMonth, 10, 16)
-	intYear, _ := strconv.ParseInt(year, 10, 16)
+func buildDateMatchCandidateTwo(day, month string, year string, i, j int) DateMatchCandidateTwo {
 
-	return match.DateMatch{Day: intDay, Month: intMonth, Year: intYear, I: i, J: j}
+	return DateMatchCandidateTwo{Day: day, Month: month, Year: year, I: i, J: j}
 }

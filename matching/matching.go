@@ -72,6 +72,8 @@ func loadFrequencyList() {
 	MATCHERS = append(MATCHERS, sequenceMatch)
 	MATCHERS = append(MATCHERS, l33tMatch)
 	MATCHERS = append(MATCHERS, dateSepMatcher)
+	MATCHERS = append(MATCHERS, dateWithoutSepMatch)
+
 
 }
 

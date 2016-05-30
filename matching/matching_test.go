@@ -7,6 +7,7 @@ import (
 	"testing"
 	"fmt"
 	"encoding/json"
+	"log"
 )
 
 //DateSepMatch("1991-09-11jibjab11.9.1991")
@@ -121,6 +122,15 @@ func TestDictionaryMatch(t *testing.T) {
 func TestDateWithoutSepMatch(t *testing.T) {
 	matches := dateWithoutSepMatch("11091991")
 	assert.Len(t, matches, 1, "Lenght should be 1")
+
+
+	matches = dateWithoutSepMatch("20010911")
+	assert.Len(t, matches, 1, "Lenght should be 1")
+	log.Println(matches)
+
+
+	//matches := dateWithoutSepMatch("110991")
+	//assert.Len(t, matches, 21, "Lenght should be blarg")
 }
 
 //l33t

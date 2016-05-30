@@ -36,8 +36,8 @@ func TestPasswordStrength(t *testing.T) {
 	runTest(t, "coRrecth0rseba++ery9.23.2007staple$", float64(66.018))
 	runTest(t, "D0g..................", float64(20.678))
 	runTest(t, "abcdefghijk987654321", float64(11.951))
-	runTest(t, "neverforget", float64(2))
-	runTest(t, "13/3/1997", float64(2))
+	runTest(t, "neverforget", float64(2))		// I think this is wrong. . .
+	runTest(t, "13/3/1997", float64(2))             // I think this is wrong. . .
 	runTest(t, "neverforget13/3/1997", float64(32.628))
 	runTest(t, "1qaz2wsx3edc", float64(19.314))
 	runTest(t, "temppass22", float64(22.179))
