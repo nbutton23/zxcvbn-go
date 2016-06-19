@@ -1,14 +1,12 @@
 package matching
 
 import (
+	"github.com/nbutton23/zxcvbn-go/entropy"
 	"github.com/nbutton23/zxcvbn-go/match"
-	"strings"
 	"regexp"
 	"strconv"
-	"github.com/nbutton23/zxcvbn-go/entropy"
+	"strings"
 )
-
-
 
 func checkDate(day, month, year int64) (bool, int64, int64, int64) {
 	if (12 <= month && month <= 31) && day <= 12 {
@@ -31,11 +29,11 @@ func dateSepMatcher(password string) []match.Match {
 	var matches []match.Match
 	for _, dateMatch := range dateMatches {
 		match := match.Match{
-			I:dateMatch.I,
-			J:dateMatch.J,
-			Entropy:entropy.DateEntropy(dateMatch),
-			DictionaryName:"date_match",
-			Token:dateMatch.Token,
+			I:              dateMatch.I,
+			J:              dateMatch.J,
+			Entropy:        entropy.DateEntropy(dateMatch),
+			DictionaryName: "date_match",
+			Token:          dateMatch.Token,
 		}
 
 		matches = append(matches, match)
@@ -55,7 +53,7 @@ func dateSepMatchHelper(password string) []match.DateMatch {
 		day, _ := strconv.ParseInt(splitV[0][4], 10, 16)
 		month, _ := strconv.ParseInt(splitV[0][2], 10, 16)
 		year, _ := strconv.ParseInt(splitV[0][6], 10, 16)
-		match := match.DateMatch{Day: day, Month: month, Year: year, Separator: splitV[0][5], I: i, J: j, Token:password[i:j]}
+		match := match.DateMatch{Day: day, Month: month, Year: year, Separator: splitV[0][5], I: i, J: j, Token: password[i:j]}
 		matches = append(matches, match)
 	}
 
@@ -67,7 +65,7 @@ func dateSepMatchHelper(password string) []match.DateMatch {
 		day, _ := strconv.ParseInt(splitV[0][4], 10, 16)
 		month, _ := strconv.ParseInt(splitV[0][6], 10, 16)
 		year, _ := strconv.ParseInt(splitV[0][2], 10, 16)
-		match := match.DateMatch{Day: day, Month: month, Year: year, Separator: splitV[0][5], I: i, J: j, Token:password[i:j]}
+		match := match.DateMatch{Day: day, Month: month, Year: year, Separator: splitV[0][5], I: i, J: j, Token: password[i:j]}
 		matches = append(matches, match)
 	}
 
@@ -92,22 +90,23 @@ type DateMatchCandidate struct {
 }
 
 type DateMatchCandidateTwo struct {
-	Day string
+	Day   string
 	Month string
-	Year     string
-	I, J     int
+	Year  string
+	I, J  int
 }
-func dateWithoutSepMatch(password string) ([]match.Match) {
+
+func dateWithoutSepMatch(password string) []match.Match {
 	dateMatches := dateWithoutSepMatchHelper(password)
 
 	var matches []match.Match
 	for _, dateMatch := range dateMatches {
 		match := match.Match{
-			I:dateMatch.I,
-			J:dateMatch.J,
-			Entropy:entropy.DateEntropy(dateMatch),
-			DictionaryName:"date_match",
-			Token:dateMatch.Token,
+			I:              dateMatch.I,
+			J:              dateMatch.J,
+			Entropy:        entropy.DateEntropy(dateMatch),
+			DictionaryName: "date_match",
+			Token:          dateMatch.Token,
 		}
 
 		matches = append(matches, match)
@@ -115,6 +114,7 @@ func dateWithoutSepMatch(password string) ([]match.Match) {
 
 	return matches
 }
+
 //TODO Has issues with 6 digit dates
 func dateWithoutSepMatchHelper(password string) (matches []match.DateMatch) {
 	matcher := regexp.MustCompile(DATE_WITHOUT_SEP_MATCH)
@@ -140,16 +140,15 @@ func dateWithoutSepMatchHelper(password string) (matches []match.DateMatch) {
 			candidatesRoundOne = append(candidatesRoundOne, buildDateMatchCandidate(v[0:lastIndex-3], v[lastIndex-3:], i, j))
 		}
 
-
 		var candidatesRoundTwo []DateMatchCandidateTwo
 		for _, c := range candidatesRoundOne {
 			if len(c.DayMonth) == 2 {
 				candidatesRoundTwo = append(candidatesRoundTwo, buildDateMatchCandidateTwo(c.DayMonth[0:0], c.DayMonth[1:1], c.Year, c.I, c.J))
 			} else if len(c.DayMonth) == 3 {
-				candidatesRoundTwo = append(candidatesRoundTwo, buildDateMatchCandidateTwo(c.DayMonth[0:2],c.DayMonth[2:2], c.Year, c.I, c.J))
-				candidatesRoundTwo = append(candidatesRoundTwo, buildDateMatchCandidateTwo(c.DayMonth[0:0],c.DayMonth[1:3], c.Year, c.I, c.J))
+				candidatesRoundTwo = append(candidatesRoundTwo, buildDateMatchCandidateTwo(c.DayMonth[0:2], c.DayMonth[2:2], c.Year, c.I, c.J))
+				candidatesRoundTwo = append(candidatesRoundTwo, buildDateMatchCandidateTwo(c.DayMonth[0:0], c.DayMonth[1:3], c.Year, c.I, c.J))
 			} else if len(c.DayMonth) == 4 {
-				candidatesRoundTwo = append(candidatesRoundTwo, buildDateMatchCandidateTwo(c.DayMonth[0:2],c.DayMonth[2:4], c.Year, c.I, c.J))
+				candidatesRoundTwo = append(candidatesRoundTwo, buildDateMatchCandidateTwo(c.DayMonth[0:2], c.DayMonth[2:4], c.Year, c.I, c.J))
 			}
 		}
 
@@ -159,21 +158,19 @@ func dateWithoutSepMatchHelper(password string) (matches []match.DateMatch) {
 				continue
 			}
 
-
 			intMonth, err := strconv.ParseInt(candidate.Month, 10, 16)
 
 			if err != nil {
 				continue
 			}
 
-
 			intYear, err := strconv.ParseInt(candidate.Year, 10, 16)
 			if err != nil {
 				continue
 			}
 
-			if ok, _, _, _:= checkDate(intDay, intMonth, intYear); ok{
-				matches = append(matches, match.DateMatch{Token:password, Pattern:"date", Day:intDay, Month:intMonth, Year:intYear, I:i, J:j })
+			if ok, _, _, _ := checkDate(intDay, intMonth, intYear); ok {
+				matches = append(matches, match.DateMatch{Token: password, Pattern: "date", Day: intDay, Month: intMonth, Year: intYear, I: i, J: j})
 			}
 
 		}

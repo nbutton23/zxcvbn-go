@@ -1,11 +1,10 @@
 package matching
 
 import (
-	"github.com/nbutton23/zxcvbn-go/match"
 	"github.com/nbutton23/zxcvbn-go/entropy"
+	"github.com/nbutton23/zxcvbn-go/match"
 	"strings"
 )
-
 
 func repeatMatch(password string) []match.Match {
 	var matches []match.Match

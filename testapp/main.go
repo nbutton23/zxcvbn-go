@@ -7,8 +7,8 @@ import (
 )
 
 func main() {
-		//password :="Testaaatyhg890l33t"
-		//fmt.Println(zxcvbn.PasswordStrength(password, nil))
+	//password :="Testaaatyhg890l33t"
+	//fmt.Println(zxcvbn.PasswordStrength(password, nil))
 
 	length := 5
 	//pass := "68f9698fe2540c525fe35b15c6ae1a1788e079962b2ada3d1872c7665c95e148"

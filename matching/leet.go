@@ -1,10 +1,10 @@
 package matching
+
 import (
-	"github.com/nbutton23/zxcvbn-go/match"
 	"github.com/nbutton23/zxcvbn-go/entropy"
+	"github.com/nbutton23/zxcvbn-go/match"
 	"strings"
 )
-
 
 func l33tMatch(password string) []match.Match {
 
@@ -16,7 +16,7 @@ func l33tMatch(password string) []match.Match {
 
 	for _, permutation := range permutations {
 		for _, mather := range DICTIONARY_MATCHERS {
-			matches = append(matches,mather(permutation)...)
+			matches = append(matches, mather(permutation)...)
 		}
 	}
 
@@ -37,13 +37,13 @@ func getAllPermutationsOfLeetSubstitutions(password string, substitutionsMap map
 			for _, sub := range splice {
 				if string(char) == sub {
 					var permutation string
-					permutation = password[:index]+value+password[index+1:]
+					permutation = password[:index] + value + password[index+1:]
 
 					permutations = append(permutations, permutation)
 					if index < len(permutation) {
-						tempPermutations := getAllPermutationsOfLeetSubstitutions(permutation[index + 1:], substitutionsMap)
+						tempPermutations := getAllPermutationsOfLeetSubstitutions(permutation[index+1:], substitutionsMap)
 						for _, temp := range tempPermutations {
-							permutations = append(permutations, permutation[:index + 1] + temp)
+							permutations = append(permutations, permutation[:index+1]+temp)
 						}
 
 					}

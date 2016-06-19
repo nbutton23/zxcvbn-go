@@ -1,11 +1,10 @@
 package entropy
 
 import (
-	"github.com/stretchr/testify/assert"
 	"github.com/nbutton23/zxcvbn-go/match"
+	"github.com/stretchr/testify/assert"
 	"testing"
 )
-
 
 func TestDictionaryEntropyCalculation(t *testing.T) {
 	match := match.Match{
@@ -22,31 +21,31 @@ func TestDictionaryEntropyCalculation(t *testing.T) {
 
 func TestSpatialEntropyCalculation(t *testing.T) {
 	matchPlain := match.Match{
-		Pattern: "spatial",
-		I:       0,
-		J:       5,
-		Token:   "asdfgh",
-		DictionaryName:"qwerty",
+		Pattern:        "spatial",
+		I:              0,
+		J:              5,
+		Token:          "asdfgh",
+		DictionaryName: "qwerty",
 	}
 	entropy := SpatialEntropy(matchPlain, 0, 0)
 	assert.Equal(t, 9.754887502163468, entropy)
 
 	matchShift := match.Match{
-		Pattern: "spatial",
-		I:       0,
-		J:       5,
-		Token:   "asdFgh",
-		DictionaryName:"qwerty",
+		Pattern:        "spatial",
+		I:              0,
+		J:              5,
+		Token:          "asdFgh",
+		DictionaryName: "qwerty",
 	}
 	entropyShift := SpatialEntropy(matchShift, 0, 1)
 	assert.Equal(t, 12.562242424221072, entropyShift)
 
 	matchTurn := match.Match{
-		Pattern: "spatial",
-		I:       0,
-		J:       5,
-		Token:   "asdcxz",
-		DictionaryName:"qwerty",
+		Pattern:        "spatial",
+		I:              0,
+		J:              5,
+		Token:          "asdcxz",
+		DictionaryName: "qwerty",
 	}
 	entropyTurn := SpatialEntropy(matchTurn, 2, 0)
 	assert.Equal(t, 14.080500893768884, entropyTurn)
