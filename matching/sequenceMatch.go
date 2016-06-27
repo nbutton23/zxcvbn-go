@@ -1,11 +1,10 @@
 package matching
 
 import (
-	"github.com/nbutton23/zxcvbn-go/match"
 	"github.com/nbutton23/zxcvbn-go/entropy"
+	"github.com/nbutton23/zxcvbn-go/match"
 	"strings"
 )
-
 
 func sequenceMatch(password string) []match.Match {
 	var matches []match.Match
@@ -39,12 +38,12 @@ func sequenceMatch(password string) []match.Match {
 			for {
 				var prevN, curN int
 				if j < len(password) {
-					prevChar, curChar := password[j - 1], password[j]
+					prevChar, curChar := password[j-1], password[j]
 					prevN, curN = strings.Index(seq, string(prevChar)), strings.Index(seq, string(curChar))
 				}
 
-				if j == len(password) || curN - prevN != seqDirection {
-					if j - i > 2 {
+				if j == len(password) || curN-prevN != seqDirection {
+					if j-i > 2 {
 						matchSequence := match.Match{
 							Pattern:        "sequence",
 							I:              i,

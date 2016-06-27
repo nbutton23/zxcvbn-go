@@ -1,10 +1,10 @@
 package matching
 
 import (
-	"github.com/nbutton23/zxcvbn-go/match"
-	"github.com/nbutton23/zxcvbn-go/entropy"
-	"strings"
 	"github.com/nbutton23/zxcvbn-go/adjacency"
+	"github.com/nbutton23/zxcvbn-go/entropy"
+	"github.com/nbutton23/zxcvbn-go/match"
+	"strings"
 )
 
 func spatialMatch(password string) (matches []match.Match) {
@@ -78,4 +78,3 @@ func spatialMatchHelper(password string, graph adjacency.AdjacencyGraph) (matche
 	}
 	return matches
 }
-

@@ -13,9 +13,9 @@ const (
 	START_UPPER string = `^[A-Z][^A-Z]+$`
 	END_UPPER   string = `^[^A-Z]+[A-Z]$'`
 	ALL_UPPER   string = `^[A-Z]+$`
-	NUM_YEARS = float64(119) // years match against 1900 - 2019
-	NUM_MONTHS = float64(12)
-	NUM_DAYS = float64(31)
+	NUM_YEARS          = float64(119) // years match against 1900 - 2019
+	NUM_MONTHS         = float64(12)
+	NUM_DAYS           = float64(31)
 )
 
 var (

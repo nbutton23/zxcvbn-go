@@ -8,10 +8,10 @@ import (
 )
 
 var (
-	DICTIONARY_MATCHERS         []func(password string) []match.Match
-	MATCHERS                    []func(password string) []match.Match
-	ADJACENCY_GRAPHS            []adjacency.AdjacencyGraph
-	L33T_TABLE                  adjacency.AdjacencyGraph
+	DICTIONARY_MATCHERS []func(password string) []match.Match
+	MATCHERS            []func(password string) []match.Match
+	ADJACENCY_GRAPHS    []adjacency.AdjacencyGraph
+	L33T_TABLE          adjacency.AdjacencyGraph
 
 	SEQUENCES map[string]string
 )
@@ -74,6 +74,4 @@ func loadFrequencyList() {
 	MATCHERS = append(MATCHERS, dateSepMatcher)
 	MATCHERS = append(MATCHERS, dateWithoutSepMatch)
 
-
 }
-
