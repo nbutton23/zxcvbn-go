@@ -1,16 +1,18 @@
 package matching
 
 import (
+	"strings"
+
 	"github.com/nbutton23/zxcvbn-go/entropy"
 	"github.com/nbutton23/zxcvbn-go/match"
-	"strings"
 )
 
 func l33tMatch(password string) []match.Match {
 
 	substitutions := relevantL33tSubtable(password)
 
-	permutations := getAllPermutationsOfLeetSubstitutions(password, substitutions)
+	memoTable := make(map[string][]string)
+	permutations := getAllPermutationsOfLeetSubstitutions(password, substitutions, memoTable)
 
 	var matches []match.Match
 
@@ -28,7 +30,11 @@ func l33tMatch(password string) []match.Match {
 	return matches
 }
 
-func getAllPermutationsOfLeetSubstitutions(password string, substitutionsMap map[string][]string) []string {
+func getAllPermutationsOfLeetSubstitutions(password string, substitutionsMap, memoTable map[string][]string) []string {
+	cached, exists := memoTable[password]
+	if exists {
+		return cached
+	}
 
 	var permutations []string
 
@@ -41,7 +47,7 @@ func getAllPermutationsOfLeetSubstitutions(password string, substitutionsMap map
 
 					permutations = append(permutations, permutation)
 					if index < len(permutation) {
-						tempPermutations := getAllPermutationsOfLeetSubstitutions(permutation[index+1:], substitutionsMap)
+						tempPermutations := getAllPermutationsOfLeetSubstitutions(permutation[index+1:], substitutionsMap, memoTable)
 						for _, temp := range tempPermutations {
 							permutations = append(permutations, permutation[:index+1]+temp)
 						}
@@ -51,6 +57,8 @@ func getAllPermutationsOfLeetSubstitutions(password string, substitutionsMap map
 			}
 		}
 	}
+
+	memoTable[password] = cached
 
 	return permutations
 }
