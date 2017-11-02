@@ -1,10 +1,17 @@
 package matching
 
 import (
+	"strings"
+
 	"github.com/nbutton23/zxcvbn-go/entropy"
 	"github.com/nbutton23/zxcvbn-go/match"
-	"strings"
 )
+
+const L33T_MATCHER_NAME = "l33t"
+
+func FilterL33tMatcher(m match.Matcher) bool {
+	return m.ID == L33T_MATCHER_NAME
+}
 
 func l33tMatch(password string) []match.Match {
 
@@ -16,7 +23,7 @@ func l33tMatch(password string) []match.Match {
 
 	for _, permutation := range permutations {
 		for _, mather := range DICTIONARY_MATCHERS {
-			matches = append(matches, mather(permutation)...)
+			matches = append(matches, mather.MatchingFunc(permutation)...)
 		}
 	}
 
