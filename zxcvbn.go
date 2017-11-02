@@ -3,7 +3,7 @@ package zxcvbn
 import (
 	"time"
 
-	"github.com/TheMacies/zxcvbn-go/match"
+	"github.com/nbutton23/zxcvbn-go/match"
 	"github.com/nbutton23/zxcvbn-go/matching"
 	"github.com/nbutton23/zxcvbn-go/scoring"
 	"github.com/nbutton23/zxcvbn-go/utils/math"
