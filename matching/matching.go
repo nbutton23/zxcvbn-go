@@ -40,12 +40,16 @@ func Omnimatch(password string, userInputs []string, filters ...func(match.Match
 	}
 
 	for _, matcher := range MATCHERS {
+		shouldBeFiltered := false
 		for i := range filters {
 			if filters[i](matcher) {
-				continue
+				shouldBeFiltered = true
+				break
 			}
 		}
-		matches = append(matches, matcher.MatchingFunc(password)...)
+		if !shouldBeFiltered {
+			matches = append(matches, matcher.MatchingFunc(password)...)
+		}
 	}
 	sort.Sort(match.Matches(matches))
 	return matches
