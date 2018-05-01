@@ -3,7 +3,6 @@ package adjacency
 import (
 	"encoding/json"
 	"log"
-	//	"fmt"
 	"github.com/nbutton23/zxcvbn-go/data"
 )
 
