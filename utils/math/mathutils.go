@@ -1,26 +1,22 @@
 package zxcvbn_math
 
-import "math"
+import (
+	"math"
+	"math/big"
+)
 
-/**
-I am surprised that I have to define these. . . Maybe i just didn't look hard enough for a lib.
-*/
-
-//http://blog.plover.com/math/choose.html
+// NChoseK returns the binomial co-efficient taking and returning float64
+// It is simply a type adjusting wrapper for big.Binomial()
 func NChoseK(n, k float64) float64 {
 	if k > n {
 		return 0
 	} else if k == 0 {
 		return 1
 	}
+	coef := new(big.Int).Binomial(int64(n), int64(k))
 
-	var r float64 = 1
-
-	for d := float64(1); d <= k; d++ {
-		r *= n
-		r /= d
-		n--
-	}
+	f := new(big.Float).SetInt(coef)
+	r, _ := f.Float64()
 
 	return r
 }
