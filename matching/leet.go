@@ -7,10 +7,12 @@ import (
 	"github.com/nbutton23/zxcvbn-go/match"
 )
 
-const L33T_MATCHER_NAME = "l33t"
+// L33TMatcherName id
+const L33TMatcherName = "l33t"
 
+//FilterL33tMatcher can be pass to zxcvbn-go.PasswordStrength to skip that matcher
 func FilterL33tMatcher(m match.Matcher) bool {
-	return m.ID == L33T_MATCHER_NAME
+	return m.ID == L33TMatcherName
 }
 
 func l33tMatch(password string) []match.Match {
@@ -19,7 +21,7 @@ func l33tMatch(password string) []match.Match {
 	var matches []match.Match
 
 	for _, permutation := range permutations {
-		for _, mather := range DICTIONARY_MATCHERS {
+		for _, mather := range dictionaryMatchers {
 			matches = append(matches, mather.MatchingFunc(permutation)...)
 		}
 	}
@@ -45,7 +47,7 @@ func getPermutations(password string) []string {
 // inside the provided password.
 func relevantL33tSubtable(password string) map[string][]string {
 	relevantSubs := make(map[string][]string)
-	for key, values := range L33T_TABLE.Graph {
+	for key, values := range l33tTable.Graph {
 		for _, value := range values {
 			if strings.Contains(password, value) {
 				relevantSubs[key] = append(relevantSubs[key], value)

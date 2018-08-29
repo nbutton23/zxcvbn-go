@@ -18,19 +18,21 @@ func buildDictMatcher(dictName string, rankedDict map[string]int) func(password 
 }
 
 func dictionaryMatch(password string, dictionaryName string, rankedDict map[string]int) []match.Match {
-	length := len(password)
 	var results []match.Match
 	pwLower := strings.ToLower(password)
 
+	pwLowerRunes := []rune(pwLower)
+	length := len(pwLowerRunes)
+
 	for i := 0; i < length; i++ {
 		for j := i; j < length; j++ {
-			word := pwLower[i : j+1]
-			if val, ok := rankedDict[word]; ok {
+			word := pwLowerRunes[i : j+1]
+			if val, ok := rankedDict[string(word)]; ok {
 				matchDic := match.Match{Pattern: "dictionary",
 					DictionaryName: dictionaryName,
 					I:              i,
 					J:              j,
-					Token:          password[i : j+1],
+					Token:          string([]rune(password)[i : j+1]),
 				}
 				matchDic.Entropy = entropy.DictionaryEntropy(matchDic, float64(val))
 
