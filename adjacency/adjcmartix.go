@@ -82,7 +82,7 @@ func (adjGrp AdjacencyGraph) CalculateAvgDegree() float64 {
 	for _, value := range adjGrp.Graph {
 
 		for _, char := range value {
-			if char != "" || char != " " {
+			if len(char) != 0 || char != " " {
 				avg += float64(len(char))
 				count++
 			}
