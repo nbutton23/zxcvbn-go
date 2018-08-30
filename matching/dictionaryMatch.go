@@ -1,9 +1,10 @@
 package matching
 
 import (
+	"strings"
+
 	"github.com/nbutton23/zxcvbn-go/entropy"
 	"github.com/nbutton23/zxcvbn-go/match"
-	"strings"
 )
 
 func buildDictMatcher(dictName string, rankedDict map[string]int) func(password string) []match.Match {
