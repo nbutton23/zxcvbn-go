@@ -1,4 +1,4 @@
-package zxcvbn_math
+package zxcvbnmath
 
 import (
 	"github.com/stretchr/testify/assert"

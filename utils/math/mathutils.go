@@ -1,9 +1,10 @@
-package zxcvbn_math
+package zxcvbnmath
 
 import (
 	"math"
 	"math/big"
 )
+
 
 // NChoseK returns the binomial co-efficient taking and returning float64
 // It is simply a type adjusting wrapper for big.Binomial()
@@ -21,6 +22,7 @@ func NChoseK(n, k float64) float64 {
 	return r
 }
 
+// Round a number
 func Round(val float64, roundOn float64, places int) (newVal float64) {
 	var round float64
 	pow := math.Pow(10, float64(places))

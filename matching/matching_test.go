@@ -106,7 +106,7 @@ func TestSpatialMatchDvorak(t *testing.T) {
 
 func TestDictionaryMatch(t *testing.T) {
 	var matches []match.Match
-	for _, dicMatcher := range DICTIONARY_MATCHERS {
+	for _, dicMatcher := range dictionaryMatchers {
 		matchesTemp := dicMatcher.MatchingFunc("first")
 		matches = append(matches, matchesTemp...)
 	}
