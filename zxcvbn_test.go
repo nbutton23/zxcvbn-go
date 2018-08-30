@@ -2,10 +2,7 @@ package zxcvbn
 
 import (
 	"testing"
-
-	"fmt"
 	"math"
-	"strconv"
 )
 
 /**
@@ -15,16 +12,6 @@ Use these test to see how close to feature parity the library is.
 const (
 	allowableError = float64(0.05)
 )
-
-type failedTest struct {
-	Password string
-	Expect   float64
-	Actual   float64
-	PError   float64
-}
-
-var failedTests []failedTest
-var numTestRan int
 
 func TestPasswordStrength(t *testing.T) {
 
@@ -65,27 +52,21 @@ func TestPasswordStrength(t *testing.T) {
 	runTest(t, "eheuczkqyq", float64(42.813))
 	runTest(t, "rWibMFACxAUGZmxhVncy", float64(104.551))
 	runTest(t, "Ba9ZyWABu99[BK#6MBgbH88Tofv)vs$", float64(161.278))
-
-	formatString := "%s : error should be less than %.2f \t Acctual error was: %.4f  \t Expected entropy %.4f \t Actual entropy %.4f \n"
-	for _, test := range failedTests {
-		fmt.Printf(formatString, test.Password, allowableError, test.PError, test.Expect, test.Actual)
-	}
-
-	pTestPassed := (float64(numTestRan-len(failedTests)) / float64(numTestRan)) * float64(100)
-
-	fmt.Println("\n % of the test passed " + strconv.FormatFloat(pTestPassed, 'f', -1, 64))
-
 }
+	
+var formatString = "%s : error should be less than %.2f Acctual error: %.4f Expected entropy %.4f Actual entropy %.4f \n"
+
 
 func runTest(t *testing.T, password string, pythonEntropy float64) {
-	//Calculated by running it through python-zxcvbn
+	
 	goEntropy := GoPasswordStrength(password, nil)
 	perror := math.Abs(goEntropy-pythonEntropy) / pythonEntropy
 
-	numTestRan++
-	if perror > allowableError {
-		failedTests = append(failedTests, failedTest{Password: password, Expect: pythonEntropy, Actual: goEntropy, PError: perror})
-	}
+	if  perror > allowableError {
+		t.Logf(formatString, password, allowableError, perror, pythonEntropy, goEntropy )
+
+		// t.Fail()
+	} 
 }
 
 func GoPasswordStrength(password string, userInputs []string) float64 {
