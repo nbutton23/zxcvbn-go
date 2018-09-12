@@ -58,7 +58,7 @@ func spatialMatchHelper(password string, graph adjacency.Graph) (matches []match
 						if lastDirection != foundDirection {
 							//adding a turn is correct even in the initial case when last_direction is null:
 							//every spatial pattern starts with a turn.
-							turns++ 
+							turns++
 							lastDirection = foundDirection
 						}
 						break

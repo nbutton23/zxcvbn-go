@@ -1,8 +1,8 @@
 package zxcvbn
 
 import (
-	"testing"
 	"math"
+	"testing"
 )
 
 /**
@@ -53,20 +53,19 @@ func TestPasswordStrength(t *testing.T) {
 	runTest(t, "rWibMFACxAUGZmxhVncy", float64(104.551))
 	runTest(t, "Ba9ZyWABu99[BK#6MBgbH88Tofv)vs$", float64(161.278))
 }
-	
+
 var formatString = "%s : error should be less than %.2f Acctual error: %.4f Expected entropy %.4f Actual entropy %.4f \n"
 
-
 func runTest(t *testing.T, password string, pythonEntropy float64) {
-	
+
 	goEntropy := GoPasswordStrength(password, nil)
 	perror := math.Abs(goEntropy-pythonEntropy) / pythonEntropy
 
-	if  perror > allowableError {
-		t.Logf(formatString, password, allowableError, perror, pythonEntropy, goEntropy )
+	if perror > allowableError {
+		t.Logf(formatString, password, allowableError, perror, pythonEntropy, goEntropy)
 
 		// t.Fail()
-	} 
+	}
 }
 
 func GoPasswordStrength(password string, userInputs []string) float64 {

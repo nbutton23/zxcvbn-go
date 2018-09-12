@@ -1,6 +1,6 @@
 package match
 
-//Matches is an alies for []Match used for sorting 
+//Matches is an alies for []Match used for sorting
 type Matches []Match
 
 func (s Matches) Len() int {
