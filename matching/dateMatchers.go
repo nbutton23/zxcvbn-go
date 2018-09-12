@@ -1,23 +1,23 @@
 package matching
 
 import (
+	"regexp"
 	"strconv"
 	"strings"
-	"regexp"
 
 	"github.com/nbutton23/zxcvbn-go/entropy"
 	"github.com/nbutton23/zxcvbn-go/match"
 )
 
 const (
-	dateSepMatcherName = "DATESEP"
+	dateSepMatcherName        = "DATESEP"
 	dateWithOutSepMatcherName = "DATEWITHOUT"
 )
 
 var (
-	dateRxYearSuffix   = regexp.MustCompile( `((\d{1,2})(\s|-|\/|\\|_|\.)(\d{1,2})(\s|-|\/|\\|_|\.)(19\d{2}|200\d|201\d|\d{2}))`)
-	dateRxYearPrefix     = regexp.MustCompile(`((19\d{2}|200\d|201\d|\d{2})(\s|-|/|\\|_|\.)(\d{1,2})(\s|-|/|\\|_|\.)(\d{1,2}))`)
-	dateWithOutSepMatch = regexp.MustCompile( `\d{4,8}`)
+	dateRxYearSuffix    = regexp.MustCompile(`((\d{1,2})(\s|-|\/|\\|_|\.)(\d{1,2})(\s|-|\/|\\|_|\.)(19\d{2}|200\d|201\d|\d{2}))`)
+	dateRxYearPrefix    = regexp.MustCompile(`((19\d{2}|200\d|201\d|\d{2})(\s|-|/|\\|_|\.)(\d{1,2})(\s|-|/|\\|_|\.)(\d{1,2}))`)
+	dateWithOutSepMatch = regexp.MustCompile(`\d{4,8}`)
 )
 
 //FilterDateSepMatcher can be pass to zxcvbn-go.PasswordStrength to skip that matcher

@@ -1,12 +1,19 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
+	"os"
+
 	"github.com/nbutton23/zxcvbn-go"
 )
 
 func main() {
-	password := "Testaaatyhg890l33t"
+
+	fmt.Println("Enter password:")
+	reader := bufio.NewReader(os.Stdin)
+	password, _ := reader.ReadString('\n')
+	//password := "Testaaatyhg890l33t"
 
 	passwordStenght := zxcvbn.PasswordStrength(password, nil)
 

@@ -6,11 +6,13 @@ import (
 
 	"github.com/nbutton23/zxcvbn-go/data"
 )
+
 // List holds a frequency list
 type List struct {
 	Name string
 	List []string
 }
+
 // Lists holds all the frequency list in a map
 var Lists = make(map[string]List)
 
