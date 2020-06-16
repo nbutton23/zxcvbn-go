@@ -1,0 +1,25 @@
+# https://taskfile.dev
+
+version: "2"
+
+output: prefixed
+
+tasks:
+  default:
+    deps:
+      - task: test
+
+  lint:
+    cmds:
+      - golangci-lint run --verbose --color=always
+    desc: Run `golangci-lint run`
+
+  build:
+    cmds:
+      - go build -v ./...
+    desc: Run `go build`
+
+  test:
+    cmds:
+      - go test -v $(go list ./... | grep -v "zxcvbn-go/data")
+    desc: Run `go test`

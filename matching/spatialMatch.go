@@ -10,7 +10,7 @@ import (
 
 const spatialMatcherName = "SPATIAL"
 
-//FilterSpatialMatcher can be pass to zxcvbn-go.PasswordStrength to skip that matcher
+// FilterSpatialMatcher can be pass to zxcvbn-go.PasswordStrength to skip that matcher
 func FilterSpatialMatcher(m match.Matcher) bool {
 	return m.ID == spatialMatcherName
 }
@@ -25,7 +25,6 @@ func spatialMatch(password string) (matches []match.Match) {
 }
 
 func spatialMatchHelper(password string, graph adjacency.Graph) (matches []match.Match) {
-
 	for i := 0; i < len(password)-1; {
 		j := i + 1
 		lastDirection := -99 //an int that it should never be!
@@ -35,17 +34,20 @@ func spatialMatchHelper(password string, graph adjacency.Graph) (matches []match
 		for {
 			prevChar := password[j-1]
 			found := false
-			foundDirection := -1
+			var foundDirection int
 			curDirection := -1
-			//My graphs seem to be wrong. . . and where the hell is qwerty
+
+			// My graphs seem to be wrong. . . and where the hell is qwerty
 			adjacents := graph.Graph[string(prevChar)]
-			//Consider growing pattern by one character if j hasn't gone over the edge
+
+			// Consider growing pattern by one character if j hasn't gone over the edge
 			if j < len(password) {
 				curChar := password[j]
+
 				for _, adj := range adjacents {
 					curDirection++
 
-					if strings.Index(adj, string(curChar)) != -1 {
+					if strings.Contains(adj, string(curChar)) {
 						found = true
 						foundDirection = curDirection
 
