@@ -156,7 +156,7 @@ func displayTime(seconds float64) string {
 	} else if seconds < year {
 		return fmt.Sprintf(formater, (1 + math.Ceil(seconds/month)), "months")
 	} else if seconds < century {
-		return fmt.Sprintf(formater, (1 + math.Ceil(seconds/century)), "years")
+		return fmt.Sprintf(formater, (math.Ceil((seconds / century) * 100)), "years")
 	} else {
 		return "centuries"
 	}
