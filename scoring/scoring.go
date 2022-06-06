@@ -3,6 +3,7 @@ package scoring
 import (
 	"fmt"
 	"github.com/nbutton23/zxcvbn-go/entropy"
+	"github.com/nbutton23/zxcvbn-go/feedback"
 	"github.com/nbutton23/zxcvbn-go/match"
 	"github.com/nbutton23/zxcvbn-go/utils/math"
 	"math"
@@ -28,6 +29,7 @@ type MinEntropyMatch struct {
 	CrackTimeDisplay string
 	Score            int
 	CalcTime         float64
+	Feedback feedback.Feedback
 }
 
 /*
@@ -110,12 +112,17 @@ func MinimumEntropyMatchSequence(password string, matches []match.Match) MinEntr
 	}
 
 	crackTime := roundToXDigits(entropyToCrackTime(minEntropy), 3)
-	return MinEntropyMatch{Password: password,
+	score := crackTimeToScore(crackTime)
+	feedback := feedback.GetFeedback(score, matchSequenceCopy)
+	return MinEntropyMatch{
+		Password: password,
 		Entropy:          roundToXDigits(minEntropy, 3),
 		MatchSequence:    matchSequenceCopy,
 		CrackTime:        crackTime,
 		CrackTimeDisplay: displayTime(crackTime),
-		Score:            crackTimeToScore(crackTime)}
+		Score:            score,
+		Feedback: feedback,
+	}
 
 }
 func get(a []float64, i int) float64 {
